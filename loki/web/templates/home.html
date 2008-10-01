@@ -72,6 +72,10 @@
         </style>
     </head>
     <body>
+      <font color="red">This interface is under development. 
+                        Bugs and enhancements should be submitted with 
+                        minor priority to 
+                         http://fedorahosted.org/loki</font> 
       <div id="main" class="all">
           <div id="bots" class="all">
               <h1>Masters:</h1>
@@ -82,7 +86,7 @@
                   <span id="{{master.name}}_status">*</span>
                 </li>
                 {% endfor %}
-                </ol>
+            </ol>
               <h1>Slaves:</h1>
                 <ol>
                 {% for slave in slaves %}
@@ -92,6 +96,8 @@
                 </li>
                 {% endfor %}
                 </ol>
+              <div align="center">Click a bot name<br>
+              for an info report.</div>
               <div id="loki_tree" class="all"></div>
           </div>
           <div id="master_report" class="report" style="visibility:hidden;">
@@ -121,6 +127,8 @@
               <div id="slave_report_botserver"></div>
               <label for="slave_report_botcomments">Comments: </label>
               <div id="slave_report_botcomments"></div>
+              <label for="slave_report_botsteps">Steps: </label>
+              <div id="slave_report_botsteps"></div>
           </div>
       </span>
     </body>
