@@ -1,6 +1,6 @@
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
-from loki import Session 
+from loki import Session
 from loki.ModelTasks import listitems
 from loki.ModelTasks import getbot
 from loki.RemoteTasks import status
@@ -10,6 +10,7 @@ import types
 
 Session = Session()
 Session = Session.getSession()
+
 
 def serialize_sqlalchemy(obj):
     serialized = {}
@@ -24,10 +25,12 @@ def serialize_sqlalchemy(obj):
     serialized = simplejson.dumps(serialized)
     return serialized
 
+
 def home(request):
     masters = listitems(MASTER, Session)
     slaves = listitems(SLAVE, Session)
     return render_to_response('home.html', locals())
+
 
 def bot_status(request, botname):
     if status(getbot(botname, Session)):
@@ -36,9 +39,10 @@ def bot_status(request, botname):
     else:
         botstatus = 'off'
         stsclr = 'red'
-    data = { 'botname' : botname, 'botstatus' : botstatus, 'stsclr' : stsclr }
+    data = {'botname': botname, 'botstatus': botstatus, 'stsclr': stsclr}
     results = simplejson.dumps(data)
     return HttpResponse(results, mimetype='application/json;')
+
 
 def bot_report(request, botname):
     bot = getbot(botname, Session)

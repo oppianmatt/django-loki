@@ -58,6 +58,10 @@ function bot_report(botname){
                 x = document.getElementById(r.type + '_report_botconfig');
                 x.innerHTML = r.config_source;
             }
+            if(r.type == 'slave') {
+                x = document.getElementById(r.type + '_report_botsteps');
+                x.innerHTML = r.steps;
+            }
         }, 
 
         timeout : 3000
