@@ -24,7 +24,6 @@ class Store(Action):
 
         SetupTasks.createSchema()
 
-
     def update(self):
         """
         Update the Database Schema.

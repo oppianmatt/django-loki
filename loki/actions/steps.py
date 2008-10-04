@@ -25,7 +25,6 @@ class Steps(Action):
         """
         StepsTasks.liststeps(master, path)
 
-
     def add(self, builder, step, order):
         """
         Add a step to a builders steps
@@ -35,7 +34,8 @@ class Steps(Action):
         \tbuilder:\treq\nBuild Slave's name
         \tstep:\treq\nclass path to step
         \torder:\treq\nnumerical order to execute the step
-        Example:\tloki steps add --builder=buildslave --step=buildbot.steps.shell.RemoteShellCommand --order=1
+        Example:\tloki steps add --builder=buildslave \
+--step=buildbot.steps.shell.RemoteShellCommand --order=1
 
         == end help ==
         """

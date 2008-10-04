@@ -88,14 +88,16 @@ def unregister(name, delete_bots=False):
     if server is None:
         Fatal('Server %s does not exist.' % name)
 
-    masters = Session.query(BuildMaster).filter_by(server_id=unicode(server.id)).all()
+    masters = Session.query(BuildMaster).filter_by(
+                  server_id=unicode(server.id)).all()
     if masters != []:
         if delete_bots:
             for master in masters:
                 loki.BotTasks.delete(master.name)
         else:
             raise(Exception("Master Bots exist, use --delete-bots to force"))
-    slaves = Session.query(BuildSlave).filter_by(server_id=unicode(server.id)).all()
+    slaves = Session.query(BuildSlave).filter_by(
+                 server_id=unicode(server.id)).all()
     if slaves != None:
         if delete_bots:
             for slave in slaves:

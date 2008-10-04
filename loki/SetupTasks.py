@@ -102,6 +102,7 @@ def createSchema():
     else:
         Success('Database Schema Setup Completed Successfully')
 
+
 def updateSchema():
     # Set up the config parser
     cp = ConfigParser.ConfigParser()

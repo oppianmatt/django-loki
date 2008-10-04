@@ -19,6 +19,7 @@ import inspect
 import buildbot.steps
 from func.minion.modules import func_module
 
+
 class OSCommands:
     """
     Proxies common shell commands.
@@ -434,13 +435,14 @@ class BuildBotModule(func_module.FuncModule):
         """
         Get a list of tuples representing steps
         each tuple will have the name of a class in the module
-        a list of required parameters and 
+        a list of required parameters and
         a dict of optional parameters and their defaults
 
         @param obj: a python package
-        @type obj: module 
+        @type obj: module
 
-        @return: dict of tuples 'StepName' : ('classname', ['reqs'], {'opts': None})
+        @return: dict of tuples 'StepName'
+                 : ('classname', ['reqs'], {'opts': None})
         """
         #x = __import__(pkg, fromlist=['module'])
         x = __import__(pkg, globals(), locals(), [pkg])
@@ -455,14 +457,16 @@ class BuildBotModule(func_module.FuncModule):
         else:
             modules.append(pkg.split('.')[-1])
             pkg = '.'.join(pkg.split('.')[0:-1])
-            
+
 
         steps = {}
         for m in modules:
             #y = __import__("%s.%s" % (pkg, m), fromlist=['module'])
             y = __import__("%s.%s" % (pkg, m), globals(), locals(), ['module'])
             for i in inspect.getmembers(y):
-                if inspect.isclass(i[1]) and i[1].__module__.startswith("%s.%s" % (pkg, m)) and not i[0].startswith('_'):
+                if inspect.isclass(i[1]) and \
+                   i[1].__module__.startswith("%s.%s" % (pkg, m)) and \
+                   not i[0].startswith('_'):
                     req = []
                     opt = {}
                     i_init = inspect.getargspec(i[1].__init__)
@@ -483,6 +487,6 @@ class BuildBotModule(func_module.FuncModule):
                     steps[i[0]] = ("%s.%s" % (i[1].__module__, i[0]), req, opt)
         return steps
 
+
 methods = BuildBotModule()
 register_rpc = methods.register_rpc
-

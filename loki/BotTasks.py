@@ -30,7 +30,8 @@ Session = Session()
 Session = Session.getSession()
 
 
-def createmaster(name, profile=None, webport=None, slaveport=None, slavepasswd=None):
+def createmaster(name, profile=None, webport=None,
+                 slaveport=None, slavepasswd=None):
     """
     Creates a master buildbot
 
@@ -50,7 +51,8 @@ def createmaster(name, profile=None, webport=None, slaveport=None, slavepasswd=N
     @type slavepasswd: str
     """
     # Check if master already Exists
-    if Session.query(BuildMaster).filter_by(name=unicode(name)).first() is not None:
+    if Session.query(BuildMaster).filter_by(
+       name=unicode(name)).first() is not None:
         Fatal('Master %s already exists.\n' % name)
 
     bot = BuildMaster(name)
@@ -101,7 +103,8 @@ def createslave(name, master, profile):
     if master == None:
         Fatal("Please specify slave bot's master using --master")
     #check if slave already exists
-    if Session.query(BuildSlave).filter_by(name=unicode(name)).first() is not None:
+    if Session.query(BuildSlave).filter_by(
+       name=unicode(name)).first() is not None:
         Fatal('Slave %s already exists.\n' % name)
 
 
@@ -287,7 +290,8 @@ def startall(type):
             if not RemoteTasks.status(bot):
                 ret = RemoteTasks.restart(bot)
         except Exception, ex:
-            Error('%s %s failed to Start: \n %s' % (type.capitalize(), bot.name, ex))
+            Error('%s %s failed to Start: \n %s' % (
+                      type.capitalize(), bot.name, ex))
         if ret is True:
             Info('%s %s Started.' % (type.capitalize(), bot.name))
 
@@ -311,7 +315,8 @@ def restartall(type):
             if RemoteTasks.status(bot):
                 ret = RemoteTasks.restart(bot)
         except Exception, ex:
-            Error('%s %s failed to restart: \n %s' % (type.capitalize(), bot.name, ex))
+            Error('%s %s failed to restart: \n %s' % (
+                      type.capitalize(), bot.name, ex))
         if ret is True:
             Info('%s %s restarted.' % (type.capitalize(), bot.name))
 
@@ -349,7 +354,8 @@ def stopall(type):
         try:
             ret = RemoteTasks.stop(bot)
         except Exception, ex:
-            Error('%s %s failed to stop: \n %s' % (type.capitalize(), bot.name, ex))
+            Error('%s %s failed to stop: \n %s' % (
+                      type.capitalize(), bot.name, ex))
         if ret is True:
             Info('%s %s stopped.' % (type.capitalize(), bot.name))
 

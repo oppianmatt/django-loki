@@ -61,6 +61,7 @@ params = Table('params', metadata,
     Column('name', types.Unicode),
     Column('value', types.Unicode))
 
+
 class Config(object):
     """
     Config Class
@@ -184,6 +185,7 @@ class BuildStep(object):
     """
     BuildStep class
     """
+
     def __init__(self, module, order):
         """
         BuildiStep class
@@ -209,6 +211,7 @@ class BuildStepParam(object):
     """
     BuildStepParam class
     """
+
     def __init__(self, module, order):
         """
         BuildStepParam class
@@ -228,7 +231,6 @@ class BuildStepParam(object):
         Returns a string representation of the object
         """
         return self.name
-
 
 
 server_properties = {'buildbots': relation(BuildBot, backref='server',

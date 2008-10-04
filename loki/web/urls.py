@@ -4,7 +4,7 @@ from views import *
 import os
 
 # mock the apache django.root option
-# http://www.example.com/loki/ 
+# http://www.example.com/loki/
 dr = 'loki/'
 # http://www.example.com/
 #dr=''
