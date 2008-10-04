@@ -39,7 +39,7 @@ class OSCommandError(Exception):
         print self.value
 
 
-class OSCommands:
+class OSCommands(object):
     """
     Proxies common shell commands.
     """
