@@ -20,7 +20,7 @@ import buildbot.steps
 from func.minion.modules import func_module
 
 
-class OSCommands:
+class OSCommands(object):
     """
     Proxies common shell commands.
     """
