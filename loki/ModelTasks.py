@@ -45,6 +45,7 @@ def listitems(type, Session):
 def getbot(botname, Session):
     return Session.query(BuildBot).filter_by(name=unicode(botname)).first()
 
+
 def allocserver(type, profile, Session):
     """
     Allocate a server of the type.  Will return the server with the fewest
@@ -59,7 +60,8 @@ def allocserver(type, profile, Session):
     if profile == None:
         servers = Session.query(Server).filter_by(type=unicode(type)).all()
     else:
-        servers = Session.query(Server).filter_by(type=unicode(type), profile=unicode(profile)).all()
+        servers = Session.query(Server).filter_by(
+                      type=unicode(type), profile=unicode(profile)).all()
 
     if len(servers) == 0:
         return None
@@ -91,12 +93,14 @@ def allocport(type, override, Session):
         return override
 
     if type == WEB:
-        web_port = Session.execute(select([func.max(masters.c.web_port)])).scalar()
+        web_port = Session.execute(select([func.max(
+                       masters.c.web_port)])).scalar()
         if web_port == None:
             return '2000'
         return web_port+1
     if type == SLAVE:
-        slave_port = Session.execute(select([func.max(masters.c.slave_port)])).scalar()
+        slave_port = Session.execute(select(
+                         [func.max(masters.c.slave_port)])).scalar()
         if slave_port== None:
             return '9000'
         return slave_port+1

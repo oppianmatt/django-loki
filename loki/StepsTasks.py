@@ -39,7 +39,8 @@ def liststeps(master=None, path=None):
     """
     #get the master if passed
     if master != None:
-        servers = Session.query(Server).filter_by(name=unicode(master),type=unicode('master')).all()
+        servers = Session.query(Server).filter_by(
+                      name=unicode(master), type=unicode('master')).all()
     else:
         servers = Session.query(Server).filter_by(type=unicode('master')).all()
 
@@ -56,7 +57,7 @@ def liststeps(master=None, path=None):
         for step in steps:
             msg += "\t%s: %s\n" % (
                 color.format_string(step, "white"),
-                _format_step(steps[step])
+                _format_step(steps[step]),
             )
 
     Log(msg[:-1])
@@ -78,12 +79,13 @@ def addstep(builder, step, order):
     """
     slave = Session.query(BuildSlave).filter_by(name=unicode(builder)).first()
     if slave == None:
-        Fatal("Build Slave %s does not exist." % builder) 
+        Fatal("Build Slave %s does not exist." % builder)
 
     stepname = step.split('.')[-1]
-    steps = RemoteTasks.getsteps(slave.master.server, '.'.join(step.split('.')[:-1]))
+    steps = RemoteTasks.getsteps(slave.master.server, '.'.join(
+                step.split('.')[:-1]))
     step_dict = {}
-    
+
     print _format_step(steps[stepname])
 
     ## for each req get the value from stdin
@@ -121,6 +123,6 @@ def _format_step(step):
 
     for opt in step[2]:
         fmt += "%s=%s, " % (opt, step[2][opt])
-	fmt = fmt[:-2]
+    fmt = fmt[:-2]
     fmt += ")"
-    return fmt 
+    return fmt

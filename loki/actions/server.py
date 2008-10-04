@@ -163,7 +163,7 @@ class Server(Action):
 
         == help ==
         \nOptions: None
-        
+
         Example:
         \tloki server genhome
         == end help ==

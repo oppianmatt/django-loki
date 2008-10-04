@@ -42,7 +42,8 @@ class Bot(Action):
         """
         BotTasks.report(name)
 
-    def create(self, name, type, master=None, profile=None, webport=None, slaveport=None, slavepasswd=None):
+    def create(self, name, type, master=None,
+               profile=None, webport=None, slaveport=None, slavepasswd=None):
         """
         Creates a new bot
 
@@ -96,7 +97,8 @@ class Bot(Action):
         @type slavepasswd: str
         """
         if type == MASTER:
-            BotTasks.createmaster(name, profile, webport, slaveport, slavepasswd)
+            BotTasks.createmaster(name, profile, webport,
+                                  slaveport, slavepasswd)
         else:
             if type == SLAVE:
                 BotTasks.createslave(name, master, profile)
@@ -154,7 +156,8 @@ class Bot(Action):
         \nOptions:
         \tname:\treq*\ta the name of a bot
         \ttype:\treq*\tmaster or slave, restarts all of passed type
-        \t\t Either --name or --type is required. --type is ignored if both are passed.
+        \t\t Either --name or --type is required. --type is \
+ignored if both are passed.
         Example:
         \tloki bot restart --name=botname
         \tloki bot restart --type=master
@@ -178,7 +181,8 @@ class Bot(Action):
         \nOptions:
         \tname:\treq*\ta the name of a bot
         \ttype:\treq*\tmaster or slave, stops all of passed type
-        \t\t Either --name or --type is required. --type is ignored if both are passed.
+        \t\t Either --name or --type is required. --type is ignored \
+if both are passed.
 
         Example:
         \tloki bot stop --name=botname

@@ -199,6 +199,8 @@ def __check_func(value):
     """
 
     #print value
-    if type(value) == types.ListType and len(value) and value[0] == 'REMOTE_ERROR':
+    if type(value) == types.ListType and \
+       len(value) and \
+       value[0] == 'REMOTE_ERROR':
         Fatal('\n'.join(value))
     return value
