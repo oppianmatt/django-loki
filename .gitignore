@@ -1,0 +1,5 @@
+# Items we should all ignore
+*.pyc
+*.pyo
+*.db
+*.swp
