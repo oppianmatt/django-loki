@@ -15,11 +15,9 @@ __LICENSE__ = 'GPLv3'
 
 from loki.SetupTasks import createSession, getConfig, validateModel
 
-SESSION = createSession(getConfig())
-validateModel(SESSION)
+class Orm(object):
+    session = None
 
-
-class Session(object):
-
-    def getSession(self):
-        return SESSION
+    def __init__(self):
+        if self.session == None: 
+            self.session = createSession(getConfig())
