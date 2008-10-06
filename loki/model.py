@@ -49,15 +49,15 @@ slaves = Table('slaves', metadata,
     Column('id', types.Integer, ForeignKey('buildbots.id'), primary_key=True),
     Column('master_id', types.Integer, ForeignKey('masters.id')))
 
-steps = Table('steps', metadata,
+configs = Table('configs', metadata,
     Column('id', types.Integer, primary_key=True),
-    Column('slave_id', types.Integer, ForeignKey('slaves.id')),
+    Column('bot_id', types.Integer, ForeignKey('buildbots.id')),
     Column('module', types.Unicode),
     Column('order', types.Integer))
 
 params = Table('params', metadata,
     Column('id', types.Integer, primary_key=True),
-    Column('step_id', types.Integer, ForeignKey('steps.id')),
+    Column('configs_id', types.Integer, ForeignKey('configs.id')),
     Column('name', types.Unicode),
     Column('value', types.Unicode))
 
@@ -181,14 +181,14 @@ class BuildSlave(BuildBot):
     pass
 
 
-class BuildStep(object):
+class BuildConfig(object):
     """
-    BuildStep class
+    BuildConfig class
     """
 
     def __init__(self, module, order):
         """
-        BuildiStep class
+        BuildConfig class
 
         @param module: name of the steps module
         @type name: string
@@ -207,14 +207,14 @@ class BuildStep(object):
         return self.module
 
 
-class BuildStepParam(object):
+class BuildParam(object):
     """
-    BuildStepParam class
+    BuildParam class
     """
 
     def __init__(self, module, order):
         """
-        BuildStepParam class
+        BuildParam class
 
         @param name: name of param
         @type name: string
@@ -237,14 +237,14 @@ server_properties = {'buildbots': relation(BuildBot, backref='server',
                                   primaryjoin=servers.c.id==bots.c.server_id)}
 master_properties = {'slaves': relation(BuildSlave, backref='master',
                                primaryjoin=masters.c.id==slaves.c.master_id)}
-slave_properties = {'steps': relation(BuildStep, backref='slave',
-                            primaryjoin=slaves.c.id==steps.c.slave_id)}
-step_properties = {'params': relation(BuildStepParam, backref='step',
-                                   primaryjoin=steps.c.id==params.c.step_id)}
+slave_properties = {'configs': relation(BuildConfig, backref='slave',
+                            primaryjoin=bots.c.id==configs.c.bot_id)}
+build_properties = {'params': relation(BuildParam, backref='configs',
+                                   primaryjoin=configs.c.id==params.c.configs_id)}
 
 
-ConfigMapper = mapper(Config, config)
-ServerMapper = mapper(Server, servers, properties = server_properties)
+LokiMapper = mapper(Config, config)
+ServerMapper = mapper(Server, servers, properties=server_properties)
 BuildBotMapper = mapper(
         BuildBot,
         bots,
@@ -262,8 +262,8 @@ SlaveMapper = mapper(
         inherits = BuildBot,
         polymorphic_identity = 'slave',
         properties = slave_properties)
-StepMapper = mapper(
-        BuildStep,
-        steps,
-        properties = step_properties)
-ParamMapper = mapper(BuildStepParam, params)
+ConfigMapper = mapper(
+        BuildConfig,
+        configs,
+        properties = build_properties)
+ParamMapper = mapper(BuildParam, params)
