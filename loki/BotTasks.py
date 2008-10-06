@@ -19,15 +19,14 @@ import time
 import loki.RemoteTasks as RemoteTasks
 
 from loki.Common import *
-from loki import Session
+from loki import Orm
 from loki.model import Server, BuildBot, BuildMaster, BuildSlave
 from loki.Log import *
 from loki.ModelTasks import listitems, allocserver, allocport, genpasswd
 from loki.Colors import Colors
 
 color = Colors()
-Session = Session()
-Session = Session.getSession()
+Session = Orm().session
 
 
 def createmaster(name, profile=None, webport=None,

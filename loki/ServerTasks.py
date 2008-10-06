@@ -22,15 +22,14 @@ import loki.ModelTasks
 import loki.RemoteTasks
 import loki.BotTasks
 
-from loki import Session
+from loki import Orm
 from loki.model import Server, BuildBot, BuildMaster, BuildSlave
 from loki.Colors import Colors
 from loki.Log import *
 from loki.Common import *
 
 color = Colors()
-Session = Session()
-Session = Session.getSession()
+Session = Orm().session
 
 
 def register(name, basedir, type, profile, comment=''):
