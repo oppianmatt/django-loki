@@ -273,7 +273,7 @@ class BuildBotModule(func_module.FuncModule):
         pidfile = "%s/twistd.pid" % bot
         if os.path.exists(pidfile):
             pid = open(pidfile).readline().strip()
-            if self.oscmd.run_command("ps %s > /dev/null" % pid) is True:
+            if self.oscmd.run_command("ps %s > /dev/null" % pid, allow_except=False) is True:
                 return True
         return False
 
