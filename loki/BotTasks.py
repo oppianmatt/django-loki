@@ -19,18 +19,20 @@ import time
 import loki.RemoteTasks as RemoteTasks
 
 from loki.Common import *
-from loki import Orm
+from loki import Session
 from loki.model import Server, BuildBot, BuildMaster, BuildSlave
 from loki.Log import *
 from loki.ModelTasks import listitems, allocserver, allocport, genpasswd
+from loki.StepsTasks import showsteps
 from loki.Colors import Colors
 
 color = Colors()
-Session = Orm().session
+Session = Session()
+Session = Session.getSession()
 
 
 def createmaster(name, profile=None, webport=None,
-                 slaveport=None, slavepasswd=None):
+                       slaveport=None, slavepasswd=None):
     """
     Creates a master buildbot
 
@@ -51,14 +53,14 @@ def createmaster(name, profile=None, webport=None,
     """
     # Check if master already Exists
     if Session.query(BuildMaster).filter_by(
-       name=unicode(name)).first() is not None:
+                     name=unicode(name)).first() is not None:
         Fatal('Master %s already exists.\n' % name)
 
-    bot = BuildMaster(name)
+    bot = BuildMaster(unicode(name))
     bot.slave_port = allocport(SLAVE, slaveport, Session)
-    bot.slave_passwd = genpasswd(slavepasswd)
+    bot.slave_passwd = unicode(genpasswd(slavepasswd))
     bot.web_port = allocport(WEB, webport, Session)
-    bot.config_source = '%s/%s/%s' % (gitserver, gitpath, name)
+    bot.config_source = u'depricated'
 
     # SQLAlchemy Session... marking where to Rollback to
     # Attempt to Allocate Server and roll back if failure
@@ -103,11 +105,11 @@ def createslave(name, master, profile):
         Fatal("Please specify slave bot's master using --master")
     #check if slave already exists
     if Session.query(BuildSlave).filter_by(
-       name=unicode(name)).first() is not None:
+                     name=unicode(name)).first() is not None:
         Fatal('Slave %s already exists.\n' % name)
 
 
-    bot = BuildSlave(name)
+    bot = BuildSlave(unicode(name))
 
     server = allocserver(SLAVE, profile, Session)
     if server is None:
@@ -239,6 +241,8 @@ def report(name=None):
                  masters,
                  color.format_string("Slaves:", "white"),
                  slaves)
+    if bot.type == SLAVE:
+        msg += showsteps(bot)
 
     Log(msg[:-1])
     return True
@@ -290,7 +294,8 @@ def startall(type):
                 ret = RemoteTasks.restart(bot)
         except Exception, ex:
             Error('%s %s failed to Start: \n %s' % (
-                      type.capitalize(), bot.name, ex))
+                                   type.capitalize(),
+                                    bot.name, ex))
         if ret is True:
             Info('%s %s Started.' % (type.capitalize(), bot.name))
 
@@ -314,8 +319,8 @@ def restartall(type):
             if RemoteTasks.status(bot):
                 ret = RemoteTasks.restart(bot)
         except Exception, ex:
-            Error('%s %s failed to restart: \n %s' % (
-                      type.capitalize(), bot.name, ex))
+            Error('%s %s failed to restart: \n %s' % (type.capitalize(),
+                                                      bot.name, ex))
         if ret is True:
             Info('%s %s restarted.' % (type.capitalize(), bot.name))
 
@@ -353,8 +358,8 @@ def stopall(type):
         try:
             ret = RemoteTasks.stop(bot)
         except Exception, ex:
-            Error('%s %s failed to stop: \n %s' % (
-                      type.capitalize(), bot.name, ex))
+            Error('%s %s failed to stop: \n %s' % (type.capitalize(),
+                                                   bot.name, ex))
         if ret is True:
             Info('%s %s stopped.' % (type.capitalize(), bot.name))
 
@@ -394,3 +399,80 @@ def reload(name):
     except Exception, ex:
         Fatal('Reload Failed: %s' % ex)
     Success('Reload Complete')
+
+
+def generate_config(name):
+
+    bot = Session.query(BuildBot).filter_by(
+                     name=unicode(name)).first()
+    if bot is None:
+        Fatal('Bot %s does not exist' % name)
+
+    if bot.type == MASTER:
+        slaves = Session.query(BuildSlave).filter_by(
+                     master_id=unicode(bot.id)).all()
+
+        buildslaves = ''
+        builders = []
+        factories = ''
+        modules = []
+        ct = 1
+        for slave in slaves:
+            #remebers the slaves
+            buildslaves += "\n    BuildSlave('%s', '%s')," % \
+                (slave.name, bot.slave_passwd)
+            #create buildfactory
+            b = '%s_%s' % (bot.name, slave.name)
+            factories += '%s = factory.BuildFactory()\n' % b
+            for step in slave.steps:
+                if step.module not in modules:
+                    modules.append(step.module)
+                factories += "%s.addStep(%s)\n" % (b,
+                                      step.module.split('.')[-1])
+            #create builder from factory
+            factories += "b%s = {'name': '%s',\n" % (ct, slave.name)
+            factories += "      'slavename': '%s',\n" % slave.name
+            factories += "      'builddir': '%s',\n" % slave.name
+            factories += "      'factory': %s, }\n\n" % b
+            # remember the builders
+            builders.append('b%s' % ct)
+            ct += 1
+
+        #restructure the imports
+        imports = ''
+        for x in modules:
+            imports += 'from %s import %s\n' % (
+                        '.'.join(x.split('.')[:-1]),
+                        x.split('.')[-1])
+
+        #generate the template
+        t = template('/etc/loki/master.cfg.tpl',
+                   botname=bot.name,
+                   webhost=bot.server,
+                   webport=bot.web_port,
+                   slaveport=bot.slave_port,
+                   buildslaves=buildslaves,
+                   imports=imports,
+                   factories=factories,
+                   builders=','.join(builders))
+
+    if bot.type == SLAVE:
+        t = template('/etc/loki/buildbot.tac.tpl',
+                   basedir=("%s/%s") % (bot.server.basedir, bot.name),
+                   masterhost=bot.master.server.name,
+                   slavename=bot.name,
+                   slaveport=bot.master.slave_port,
+                   slavepasswd=bot.master.slave_passwd)
+
+    #write the file to the bot over func
+    if not RemoteTasks.config(bot, t):
+        Success('config unchanged.')
+    else:
+        Success('Config updated.')
+
+
+def template(tpl, **vars):
+    """
+    TODO: Document me!
+    """
+    return open(tpl, 'r').read() % vars
