@@ -17,12 +17,11 @@ import OSCommands
 import os
 
 from loki.model import Server, BuildBot, BuildMaster, BuildSlave
-from loki import Session
+from loki import Orm
 from loki.ModelTasks import listitems
 from loki.Common import *
 
-Session = Session()
-Session = Session.getSession()
+Session = Orm().session
 
 oscmd = OSCommands.OSCommands(None)
 # used to look like this: what was the err for?

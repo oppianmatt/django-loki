@@ -1,6 +1,6 @@
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
-from loki import Session
+from loki import Orm
 from loki.ModelTasks import listitems
 from loki.ModelTasks import getbot
 from loki.RemoteTasks import status
@@ -8,8 +8,7 @@ from django.utils import simplejson
 from loki.Common import *
 import types
 
-Session = Session()
-Session = Session.getSession()
+Session = Orm().session
 
 
 def serialize_sqlalchemy(obj):
