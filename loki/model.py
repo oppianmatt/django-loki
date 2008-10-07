@@ -208,12 +208,19 @@ class BuildConfig(object):
         return self.module
 
 
+class BuildStep(BuildConfig):
+    """
+    BuildStep class
+    """
+    pass
+
+
 class BuildParam(object):
     """
     BuildParam class
     """
 
-    def __init__(self, module, order):
+    def __init__(self, name, value):
         """
         BuildParam class
 
@@ -238,33 +245,40 @@ server_properties = {'buildbots': relation(BuildBot, backref='server',
                                   primaryjoin=servers.c.id==bots.c.server_id)}
 master_properties = {'slaves': relation(BuildSlave, backref='master',
                                primaryjoin=masters.c.id==slaves.c.master_id)}
-slave_properties = {'configs': relation(BuildConfig, backref='slave',
+slave_properties = {'steps': relation(BuildStep, backref='slave',
                             primaryjoin=bots.c.id==configs.c.bot_id)}
-build_properties = {'params': relation(BuildParam, backref='configs',
+step_properties = {'params': relation(BuildParam, backref='steps',
                                    primaryjoin=configs.c.id==params.c.configs_id)}
 
 
-LokiMapper = mapper(Config, config)
+ConfigMapper = mapper(Config, config)
 ServerMapper = mapper(Server, servers, properties=server_properties)
 BuildBotMapper = mapper(
         BuildBot,
         bots,
         polymorphic_on = bots.c.type,
-        polymorphic_identity = 'bot')
+        polymorphic_identity = u'bot')
 MasterMapper = mapper(
         BuildMaster,
         masters,
         inherits = BuildBot,
-        polymorphic_identity = 'master',
+        polymorphic_identity = u'master',
         properties = master_properties)
 SlaveMapper = mapper(
         BuildSlave,
         slaves,
         inherits = BuildBot,
-        polymorphic_identity = 'slave',
+        polymorphic_identity = u'slave',
         properties = slave_properties)
-ConfigMapper = mapper(
+ConfigsMapper = mapper(
         BuildConfig,
         configs,
-        properties = build_properties)
+        polymorphic_on = configs.c.type,
+        polymorphic_identity = u'config')
+StepMapper = mapper(
+        BuildStep,
+        configs,
+        inherits = BuildConfig,
+        polymorphic_identity = u'step',
+        properties = step_properties)
 ParamMapper = mapper(BuildParam, params)

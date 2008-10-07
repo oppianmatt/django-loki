@@ -40,3 +40,18 @@ class Steps(Action):
         == end help ==
         """
         StepsTasks.addstep(builder, step, order)
+
+    def delete(self, builder, order):
+        """
+        Delete a builders step
+
+        == help ==
+        \nOptions:
+        \tbuilder:\treq\nBuild Slave's name
+        \torder:\treq\nnumerical order to execute the step
+        Example:\tloki steps delete --builder=buildslave \
+--order=1
+
+        == end help ==
+        """
+        StepsTasks.deletestep(builder, order)

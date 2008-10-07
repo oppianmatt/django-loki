@@ -25,7 +25,7 @@ from loki.model import Server
 from loki.model import BuildBot
 from loki.model import BuildMaster
 from loki.model import BuildSlave
-from loki.model import BuildConfig
+from loki.model import BuildStep
 from loki.model import BuildParam
 from loki.Log import *
 from loki.ModelTasks import listitems
@@ -113,16 +113,16 @@ def addstep(builder, step, order):
             step_dict[opt] = hold_val
 
     #make a Build Step
-    dbstep = BuildConfig(unicode(step), order)
+    dbstep = BuildStep(unicode(step), order)
     Session.save(dbstep)
     #add params
     for param in step_dict:
-        dbparam = BuildStepParam(unicode(param), unicode(step_dict[param]))
+        dbparam = BuildParam(unicode(param), unicode(step_dict[param]))
         dbstep.params.append(dbparam)
         Session.save(dbparam)
 
     #save steps/params
-    slave.configs.append(dbstep)
+    slave.steps.append(dbstep)
 
     Session.commit()
     #report steps
@@ -175,7 +175,7 @@ def showsteps(slave):
     @type slave: BuildSlave
     """
     fmt = ''
-    for step in slave.configs:
+    for step in slave.steps:
         fmt += "    %s: %s\n" % (
             color.format_string(step.order, "blue"),
             color.format_string(step.module, "blue"))
