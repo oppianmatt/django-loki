@@ -1,3 +1,18 @@
+# Copyright 2008, Red Hat, Inc
+# Dan Radez <dradez@redhat.com>
+#
+# This software may be freely redistributed under the terms of the GNU
+# general public license.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+"""
+Global views.
+"""
+
+import types
+
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from loki import Orm
@@ -6,12 +21,15 @@ from loki.ModelTasks import getbot
 from loki.RemoteTasks import status
 from django.utils import simplejson
 from loki.Common import *
-import types
+
 
 Session = Orm().session
 
 
 def serialize_sqlalchemy(obj):
+    """
+    TODO: Document me.
+    """
     serialized = {}
     for item in obj.__dict__.iteritems():
         try:
@@ -26,12 +44,18 @@ def serialize_sqlalchemy(obj):
 
 
 def home(request):
+    """
+    TODO: Document me.
+    """
     masters = listitems(MASTER, Session)
     slaves = listitems(SLAVE, Session)
     return render_to_response('home.html', locals())
 
 
 def bot_status(request, botname):
+    """
+    TODO: Document me.
+    """
     if status(getbot(botname, Session)):
         botstatus = 'on'
         stsclr = 'green'
@@ -44,6 +68,9 @@ def bot_status(request, botname):
 
 
 def bot_report(request, botname):
+    """
+    TODO: Document me.
+    """
     bot = getbot(botname, Session)
     results = serialize_sqlalchemy(bot)
     return HttpResponse(results, mimetype='test;')

@@ -1,7 +1,22 @@
+# Copyright 2008, Red Hat, Inc
+# Dan Radez <dradez@redhat.com>
+#
+# This software may be freely redistributed under the terms of the GNU
+# general public license.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+"""
+Global url mappings.
+"""
+
+import os
+
 from django.conf.urls.defaults import *
 
 from views import *
-import os
+
 
 # mock the apache django.root option
 # http://www.example.com/loki/
@@ -12,6 +27,7 @@ dr = 'loki/'
 #yui info
 yui_path = os.path.join(os.path.dirname(__file__), 'yui')
 yui_path = yui_path.replace('\\', '/')
+
 
 urlpatterns = patterns('',
     # serve yui files
