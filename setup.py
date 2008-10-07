@@ -20,10 +20,10 @@ from loki import __VERSION__, __LICENSE__
 setup(name = "loki",
     version = __VERSION__,
     description = "buildbot helper utility.",
-    author = 'Scott Henson, Steve Milner, Dan Radez',
-    author_email = 'shenson@redhat.com, \
-                    smilner@redhat.com, \
-                    dradez@redhat.com',
+    author = 'Dan Radez, Scott Henson, Steve Milner',
+    author_email = 'dradez@redhat.com, \
+                    shenson@redhat.com, \
+                    smilner@redhat.com',
 
     data_files=[('/etc/loki/', ['etc/loki.conf'])],
 
@@ -35,7 +35,7 @@ setup(name = "loki",
 
     packages = ['loki', 'loki.actions'],
 
-    py_modules = ['func.minion.modules.buildbot'],
+    py_modules = ['func.minion.modules.loki_buildbot'],
 
     classifiers=[
         'License :: OSI Approved ::  GNU General Public License (GPL)',
