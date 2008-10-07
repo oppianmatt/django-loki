@@ -16,8 +16,13 @@ and make the call to the build nodes to do the actual work.
 """
 
 import types
-from CommonTasks import getminion, getbot, getpath
+import xmlrpclib
+from os import tmpfile
+from CommonTasks import getminion
+from CommonTasks import getbot
+from CommonTasks import getpath
 from loki.Log import Fatal
+from Common import *
 
 
 def restart(bot):
@@ -167,7 +172,8 @@ def delete(bot):
     if status(bot):
         stop(bot)
     rbot = getbot(bot)
-    return __check_func(rbot.loki_buildbot.delete())
+    rpath = getpath(bot=bot)
+    return __check_func(rbot.loki_buildbot.delete(bot.name, rpath))
 
 
 def getclasses(server, path):
@@ -204,3 +210,30 @@ def __check_func(value):
        value[0] == 'REMOTE_ERROR':
         Fatal('\n'.join(value))
     return value
+
+
+def config(bot, data):
+    """
+    Push a config   
+
+    @param bot: The bot you wish to write config to
+    @type bot: SQLAlchemy Model
+
+    @param data: The contents to write
+    @type data: string
+    """
+    if not exists(bot):
+        raise(Exception('Bot missing on remote Node'))
+    #directory exists so push the config
+    rbot = getbot(bot)
+    rpath = getpath(bot=bot)
+    f = tmpfile()   
+    f.write(data)   
+    f.seek(0)
+    data = xmlrpclib.Binary(f.read())
+    if bot.type == MASTER:
+        path = "%s/%s/master.cfg" % (rpath, bot.name)
+    if bot.type == SLAVE:
+        path = "%s/%s/buildbot.tac" % (rpath, bot.name)
+
+    return __check_func(rbot.copyfile.copyfile(path, data))
