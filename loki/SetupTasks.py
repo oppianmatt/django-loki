@@ -63,10 +63,10 @@ def getConfig(config=CONFIGFILE):
 
 
 def validateModel(Session, show_warn=True):
-    try:
-        check_db = Session.query(Config).filter_by(name=u'dbversion').first()
-    except:
-        check_db = Config('dbversion', '0')
+    #try:
+    check_db = Session.query(Config).filter_by(name=u'dbversion').first()
+    #except:
+    #    check_db = Config('dbversion', '0')
     if check_db.value == DBVERSION:
         return check_db.value
 
