@@ -63,10 +63,10 @@ def getConfig(config=CONFIGFILE):
 
 
 def validateModel(Session, show_warn=True):
-    #try:
-    check_db = Session.query(Config).filter_by(name=u'dbversion').first()
-    #except:
-    #    check_db = Config('dbversion', '0')
+    try:
+        check_db = Session.query(Config).filter_by(name=u'dbversion').first()
+    except:
+        check_db = Config('dbversion', '0')
     if check_db.value == DBVERSION:
         return check_db.value
 
@@ -113,7 +113,7 @@ def updateSchema():
     Session = createSession(None, sa_engine)
     model_v = validateModel(Session, show_warn=False)
     if model_v == '1':
-        metadata.tables['config'].create(sa_engine, True)
+        metadata.tables['configs'].create(sa_engine, True)
         metadata.tables['params'].create(sa_engine, True)
         db_v = Session.query(Config).filter_by(name=u'dbversion').first()
         db_v.value = u'2'

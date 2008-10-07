@@ -52,6 +52,7 @@ slaves = Table('slaves', metadata,
 configs = Table('configs', metadata,
     Column('id', types.Integer, primary_key=True),
     Column('bot_id', types.Integer, ForeignKey('buildbots.id')),
+    Column('type', types.Unicode),
     Column('module', types.Unicode),
     Column('order', types.Integer))
 

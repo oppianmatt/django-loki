@@ -20,9 +20,18 @@ import loki.RemoteTasks as RemoteTasks
 
 from loki.Common import *
 from loki import Orm
-from loki.model import Server, BuildBot, BuildMaster, BuildSlave
+from loki.model import Server
+from loki.model import Server
+from loki.model import BuildBot
+from loki.model import BuildMaster
+from loki.model import BuildSlave
+from loki.model import BuildConfig
+from loki.model import BuildParam
 from loki.Log import *
-from loki.ModelTasks import listitems, allocserver, allocport, genpasswd
+from loki.ModelTasks import listitems
+from loki.ModelTasks import allocserver
+from loki.ModelTasks import allocport
+from loki.ModelTasks import genpasswd
 from loki.Colors import Colors
 
 color = Colors()
@@ -38,8 +47,8 @@ def liststeps(master=None, path=None):
     """
     #get the master if passed
     if master != None:
-        servers = Session.query(Server).filter_by(
-                      name=unicode(master), type=unicode('master')).all()
+        servers = Session.query(Server).filter_by(name=unicode(master),
+                                        type=unicode('master')).all()
     else:
         servers = Session.query(Server).filter_by(type=unicode('master')).all()
 
@@ -56,8 +65,7 @@ def liststeps(master=None, path=None):
         for step in steps:
             msg += "\t%s: %s\n" % (
                 color.format_string(step, "white"),
-                _format_step(steps[step]),
-            )
+                _format_step(steps[step]))
 
     Log(msg[:-1])
     return True
@@ -81,8 +89,8 @@ def addstep(builder, step, order):
         Fatal("Build Slave %s does not exist." % builder)
 
     stepname = step.split('.')[-1]
-    steps = RemoteTasks.getsteps(slave.master.server, '.'.join(
-                step.split('.')[:-1]))
+    steps = RemoteTasks.getsteps(slave.master.server,
+                                 '.'.join(step.split('.')[:-1]))
     step_dict = {}
 
     print _format_step(steps[stepname])
@@ -104,9 +112,42 @@ def addstep(builder, step, order):
         if hold_val != '':
             step_dict[opt] = hold_val
 
-    print step_dict
-    #Log(msg[:-1])
+    #make a Build Step
+    dbstep = BuildConfig(unicode(step), order)
+    Session.save(dbstep)
+    #add params
+    for param in step_dict:
+        dbparam = BuildStepParam(unicode(param), unicode(step_dict[param]))
+        dbstep.params.append(dbparam)
+        Session.save(dbparam)
+
+    #save steps/params
+    slave.configs.append(dbstep)
+
+    Session.commit()
+    #report steps
+    Log(showsteps(slave))
     return True
+
+
+def deletestep(builder, order):
+    """
+    delete step to a build slave.
+
+    @param builder: Name of the build slave
+    @type builder: str
+
+    @param order: numerical order the step will be executed
+    @type order: integer
+    """
+    slave = Session.query(BuildSlave).filter_by(name=unicode(builder)).first()
+    if slave == None:
+        Fatal("Build Slave %s does not exist." % builder)
+    for step in slave.steps:
+        if int(step.order) == int(order):
+            Warn('Deleted step %s' % step)
+            Session.delete(step)
+    Session.commit()
 
 
 def _format_step(step):
@@ -116,12 +157,31 @@ def _format_step(step):
     @param step: the step to format
     @type step: ('step.path.name', (req,params), { 'opt' : 'default' } )
     """
-    fmt = "%s(" % step[0].split('.')[-1]
-    for req in step[1]:
-        fmt += "%s, " % req
-
+    fmt = "%s(" % step[0]
+    params = []
+    params.extend(step[1])
     for opt in step[2]:
-        fmt += "%s=%s, " % (opt, step[2][opt])
-    fmt = fmt[:-2]
+        params.append("%s=%s" % (opt, step[2][opt]))
+    fmt += ', '.join(params)
     fmt += ")"
+    return fmt
+
+
+def showsteps(slave):
+    """
+    format and return a list of steps for a slave
+
+    @param slave: the slave to print steps for
+    @type slave: BuildSlave
+    """
+    fmt = ''
+    for step in slave.configs:
+        fmt += "    %s: %s\n" % (
+            color.format_string(step.order, "blue"),
+            color.format_string(step.module, "blue"))
+        step.params.reverse()
+        for param in step.params:
+            fmt += "\t%s: %s\n" % (
+                color.format_string(param.name, "white"),
+                param.value)
     return fmt
