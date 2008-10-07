@@ -63,7 +63,7 @@ def createmaster(name, profile=None, webport=None,
 
     # SQLAlchemy Session... marking where to Rollback to
     # Attempt to Allocate Server and roll back if failure
-    server = allocserver(MASTER, None, Session)
+    server = allocserver(MASTER, profile, Session)
     if server is None:
         Session.rollback()
         Session.remove()
@@ -418,13 +418,16 @@ def generate_config(name):
         Fatal('Bot %s does not exist' % name)
 
     if bot.type == MASTER:
-        slaves = Session.query(BuildSlave).filter_by(
-                     master_id=unicode(bot.id)).all()
+        master = Session.query(BuildMaster).filter_by(
+                     name=unicode(name)).first()
+        slaves = master.slaves
 
         buildslaves = ''
         builders = []
         factories = ''
         modules = []
+        statuses = ''
+        schedulers = ''
         ct = 1
         for slave in slaves:
             #remebers the slaves
@@ -437,7 +440,7 @@ def generate_config(name):
                 if step.module not in modules:
                     modules.append(step.module)
                 factories += "%s.addStep(%s)\n" % (b,
-                                      step.module.split('.')[-1])
+                                      _generate_class(step))
             #create builder from factory
             factories += "b%s = {'name': '%s',\n" % (ct, slave.name)
             factories += "      'slavename': '%s',\n" % slave.name
@@ -447,6 +450,11 @@ def generate_config(name):
             builders.append('b%s' % ct)
             ct += 1
 
+        #generate statuses
+        for status in master.statuses:
+            statuses += "c['status'].append(%s)" % _generate_class(status)
+            modules.append(status.module)
+
         #restructure the imports
         imports = ''
         for x in modules:
@@ -455,7 +463,7 @@ def generate_config(name):
                         x.split('.')[-1])
 
         #generate the template
-        t = template('/etc/loki/master.cfg.tpl',
+        t = _template('/etc/loki/master.cfg.tpl',
                    botname=bot.name,
                    webhost=bot.server,
                    webport=bot.web_port,
@@ -463,10 +471,12 @@ def generate_config(name):
                    buildslaves=buildslaves,
                    imports=imports,
                    factories=factories,
-                   builders=','.join(builders))
+                   builders=','.join(builders),
+                   statuses=statuses,
+                   schedulers=schedulers)
 
     if bot.type == SLAVE:
-        t = template('/etc/loki/buildbot.tac.tpl',
+        t = _template('/etc/loki/buildbot.tac.tpl',
                    basedir=("%s/%s") % (bot.server.basedir, bot.name),
                    masterhost=bot.master.server.name,
                    slavename=bot.name,
@@ -480,8 +490,15 @@ def generate_config(name):
         Success('Config updated.')
 
 
-def template(tpl, **vars):
+def _template(tpl, **vars):
     """
     TODO: Document me!
     """
     return open(tpl, 'r').read() % vars
+
+
+def _generate_class(cls):
+   gcls = cls.module.split('.')[-1]
+   gprm = ["%s=%s" % (param.name, param.value) for param in cls.params]
+   return "%s(%s)"% (gcls,\
+                     ', '.join(gprm))

@@ -65,11 +65,13 @@ c['change_source'] = PBChangeSource()
 
 ## configure the Schedulers
 
-from buildbot.scheduler import Scheduler
+#from buildbot.scheduler import Scheduler
 c['schedulers'] = []
-c['schedulers'].append(Scheduler(name="all", branch=None,
-                                 treeStableTimer=2*60,
-                                 builderNames=["buildbot-full"]))
+#c['schedulers'].append(Scheduler(name="all", branch=None,
+#                                 treeStableTimer=2*60,
+#                                 builderNames=["buildbot-full"]))
+
+%(schedulers)s
 
 
 ####### BUILDERS
@@ -92,25 +94,12 @@ c['schedulers'].append(Scheduler(name="all", branch=None,
 # sources. There are source-obtaining Steps in buildbot/steps/source.py for
 # CVS, SVN, and others.
 
-cvsroot = ":pserver:anonymous@cvs.sourceforge.net:/cvsroot/buildbot"
-cvsmodule = "buildbot"
-
 from buildbot.process import factory
-from buildbot.steps.source import CVS
-from buildbot.steps.shell import Compile
-from buildbot.steps.python_twisted import Trial
-f1 = factory.BuildFactory()
-f1.addStep(CVS(cvsroot=cvsroot, cvsmodule=cvsmodule, login="", mode="copy"))
-f1.addStep(Compile(command=["python", "./setup.py", "build"]))
-f1.addStep(Trial(testpath="."))
+%(imports)s
 
-b1 = {'name': "buildbot-full",
-      'slavename': "bot1name",
-      'builddir': "full",
-      'factory': f1,
-      }
-c['builders'] = [b1]
+%(factories)s
 
+c['builders'] = [%(builders)s]
 
 ####### STATUS TARGETS
 
@@ -134,6 +123,8 @@ c['status'].append(html.WebStatus(http_port=%(webport)s))
 #
 # from buildbot.status import client
 # c['status'].append(client.PBListener(9988))
+
+%(statuses)s
 
 
 ####### DEBUGGING OPTIONS

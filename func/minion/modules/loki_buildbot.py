@@ -107,11 +107,11 @@ class BuildBotModule(func_module.FuncModule):
         #    time.sleep(1)
         try:
             self.__create_user(name, path)
-            self.__git(name, path, 'clone', gitrepo=gitrepo)
+            #self.__git(name, path, 'clone', gitrepo=gitrepo)
             self.oscmd.run_command('buildbot create-master %s' % \
                                self.__bot(name, path))
-            self.oscmd.run_command('cd %s ;git checkout HEAD; git pull' % \
-                                   (self.__bot(name, path)))
+            #self.oscmd.run_command('cd %s ;git checkout HEAD; git pull' % \
+            #                       (self.__bot(name, path)))
             self.oscmd.run_command('chown -R %s.buildbots %s ' % \
                                (name, self.__bot(name, path)))
         except Exception, ex:
