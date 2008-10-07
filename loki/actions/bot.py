@@ -233,9 +233,9 @@ if both are passed.
         """
         BotTasks.reload(name)
 
-    def gen(self, name):
+    def config(self, name):
         """
-        Test Generate a bots config
+        Generate a bots config
 
         == help ==
         \nOptions:
@@ -248,4 +248,4 @@ if both are passed.
         @param name: the name of an existing bot
         @type name: str
         """
-        ConfigTasks.generate_config(name)
+        BotTasks.generate_config(name)

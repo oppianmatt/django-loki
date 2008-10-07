@@ -16,7 +16,6 @@ import os
 import popen2
 import time
 import inspect
-import buildbot.steps
 from func.minion.modules import func_module
 
 
@@ -62,7 +61,7 @@ class OSCommands(object):
 
 class BuildBotModule(func_module.FuncModule):
     """
-    BuildBot creation class
+    BuildBot management
     """
     version = "0.3.5"
     api_version = "0.0.1"
@@ -85,7 +84,7 @@ class BuildBotModule(func_module.FuncModule):
             "status": self.status,
             "exists": self.exists,
             "list": self.list,
-            "showsteps": self.showsteps}
+            "showclasses": self.showclasses}
         func_module.FuncModule.__init__(self)
         self.oscmd = OSCommands(logger = self.logger)
 
@@ -431,21 +430,21 @@ class BuildBotModule(func_module.FuncModule):
                 raise(Exception(ex))
         return True
 
-    def showsteps(self, pkg='buildbot.steps'):
+    def showclasses(self, path='buildbot.steps'):
         """
-        Get a list of tuples representing steps
+        Get a list of tuples representing classes for config
         each tuple will have the name of a class in the module
         a list of required parameters and
         a dict of optional parameters and their defaults
 
-        @param obj: a python package
+        @param obj: a python package or module path
         @type obj: module
 
-        @return: dict of tuples 'StepName'
-                 : ('classname', ['reqs'], {'opts': None})
+        @return: dict of tuples 'ClassName'
+                 : ('classpath', ['reqs'], {'opts': None})
         """
         #x = __import__(pkg, fromlist=['module'])
-        x = __import__(pkg, globals(), locals(), [pkg])
+        x = __import__(path, globals(), locals(), [path])
 
         modules = []
         #Check if x is a directory and get it's modules
@@ -455,18 +454,19 @@ class BuildBotModule(func_module.FuncModule):
                     modules.append(f.split('.')[0])
         #or it is a module so adjust
         else:
-            modules.append(pkg.split('.')[-1])
-            pkg = '.'.join(pkg.split('.')[0:-1])
+            modules.append(path.split('.')[-1])
+            path = '.'.join(path.split('.')[0:-1])
 
 
-        steps = {}
+        classes = {}
         for m in modules:
             #y = __import__("%s.%s" % (pkg, m), fromlist=['module'])
-            y = __import__("%s.%s" % (pkg, m), globals(), locals(), ['module'])
+            y = __import__("%s.%s" % (path, m), globals(), locals(), ['module'])
             for i in inspect.getmembers(y):
                 if inspect.isclass(i[1]) and \
-                   i[1].__module__.startswith("%s.%s" % (pkg, m)) and \
-                   not i[0].startswith('_'):
+                   i[1].__module__.startswith("%s.%s" % (path, m)) and \
+                   not i[0].startswith('_') and \
+                   hasattr(i[1], '__init__'):
                     req = []
                     opt = {}
                     i_init = inspect.getargspec(i[1].__init__)
@@ -484,8 +484,8 @@ class BuildBotModule(func_module.FuncModule):
                                 else:
                                     req.append(a)
                         c = c + 1
-                    steps[i[0]] = ("%s.%s" % (i[1].__module__, i[0]), req, opt)
-        return steps
+                    classes[i[0]] = ("%s.%s" % (i[1].__module__, i[0]), req, opt)
+        return classes
 
 
 methods = BuildBotModule()

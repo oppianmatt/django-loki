@@ -170,25 +170,25 @@ def delete(bot):
     return __check_func(rbot.loki_buildbot.delete())
 
 
-def getsteps(server, path):
+def getclasses(server, path):
     """
-    Gets a master's buildsteps
+    Gets a master's classes from a path
 
     @param bot: The server you want to get steps from
     @type bot: SQLAlchemy Model
     """
     m = getminion(server.name)
     if path == None:
-        stps = m.loki_buildbot.showsteps()
+        clses = m.loki_buildbot.showclasses()
     else:
-        stps = m.loki_buildbot.showsteps(path)
+        clses = m.loki_buildbot.showclasses(path)
     #clean up LokiNone strings to be type None
-    if type(stps) == types.DictType:
-        for step in stps:
-            for param in stps[step][2]:
-                if stps[step][2][param] == 'LokiNone':
-                    stps[step][2][param] = None
-    return __check_func(stps)
+    if type(clses) == types.DictType:
+        for cls in clses:
+            for param in clses[cls][2]:
+                if clses[cls][2][param] == 'LokiNone':
+                    clses[cls][2][param] = None
+    return __check_func(clses)
 
 
 def __check_func(value):

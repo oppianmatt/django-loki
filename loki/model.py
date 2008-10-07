@@ -215,6 +215,20 @@ class BuildStep(BuildConfig):
     pass
 
 
+class BuildStatus(BuildConfig):
+    """
+    BuildStep class
+    """
+    pass
+
+
+class BuildScheduler(BuildConfig):
+    """
+    BuildStep class
+    """
+    pass
+
+
 class BuildParam(object):
     """
     BuildParam class
@@ -244,11 +258,21 @@ class BuildParam(object):
 server_properties = {'buildbots': relation(BuildBot, backref='server',
                                   primaryjoin=servers.c.id==bots.c.server_id)}
 master_properties = {'slaves': relation(BuildSlave, backref='master',
-                               primaryjoin=masters.c.id==slaves.c.master_id)}
+                               primaryjoin=masters.c.id==slaves.c.master_id),
+                     'schedulers': relation(BuildScheduler, backref='master',
+                               primaryjoin=bots.c.id==configs.c.bot_id),
+                     'statuses': relation(BuildStatus, backref='master',
+                               primaryjoin=bots.c.id==configs.c.bot_id)}
 slave_properties = {'steps': relation(BuildStep, backref='slave',
                             primaryjoin=bots.c.id==configs.c.bot_id)}
-step_properties = {'params': relation(BuildParam, backref='steps',
+step_properties = {'params': relation(BuildParam, backref='step',
                                    primaryjoin=configs.c.id==params.c.configs_id)}
+status_properties = {'params': relation(BuildParam, backref='status',
+                                   primaryjoin=configs.c.id==params.c.configs_id)}
+scheduler_properties = {'params': relation(BuildParam, backref='scheduler',
+                                   primaryjoin=configs.c.id==params.c.configs_id)}
+
+
 
 
 ConfigMapper = mapper(Config, config)
@@ -281,4 +305,16 @@ StepMapper = mapper(
         inherits = BuildConfig,
         polymorphic_identity = u'step',
         properties = step_properties)
+StatusMapper = mapper(
+        BuildStatus,
+        configs,
+        inherits = BuildConfig,
+        polymorphic_identity = u'status',
+        properties = status_properties)
+SchedulerMapper = mapper(
+        BuildScheduler,
+        configs,
+        inherits = BuildConfig,
+        polymorphic_identity = u'scheduler',
+        properties = scheduler_properties)
 ParamMapper = mapper(BuildParam, params)
