@@ -53,4 +53,4 @@ class Config(Action):
 
         == end help ==
         """
-        ConfigTasks.delete(type, builder, order)
+        ConfigTasks.delete(type, bot, order)

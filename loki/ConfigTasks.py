@@ -88,10 +88,12 @@ def add(type, bot, path, order):
     #make a Build Config Object
     if type == STEP:
         dbcls = BuildStep(unicode(path), order)
-        cfg = bot.steps
         bot = Session.query(BuildSlave).filter_by(name=unicode(bot)).first()
+        cfg = bot.steps
+        master = bot.master.server
     else:
         bot = Session.query(BuildMaster).filter_by(name=unicode(bot)).first()
+        master = bot.server
         if type == STATUS:
             dbcls = BuildStatus(unicode(path), order)
             cfg = bot.statuses
@@ -109,11 +111,11 @@ def add(type, bot, path, order):
 
     #load the class and get parameters
     clsname = path.split('.')[-1]
-    clses = RemoteTasks.getclasses(slave.master.server,
+    clses = RemoteTasks.getclasses(master,
                                  '.'.join(path.split('.')[:-1]))
     cls_dict = {}
 
-    print _format_class(clses[clspname])
+    print _format_class(clses[clsname])
 
     ## for each req get the value from stdin
     for req in clses[clsname][1]:
@@ -143,7 +145,7 @@ def add(type, bot, path, order):
 
     Session.commit()
 
-    Log(showclasses(bot))
+    Log(showclasses(type, bot))
     return True
 
 
@@ -161,8 +163,8 @@ def delete(type, bot, order):
     @type order: integer
     """
     if type == STEP:
-        cfg = bot.steps
         bot = Session.query(BuildSlave).filter_by(name=unicode(bot)).first()
+        cfg = bot.steps
     else:
         bot = Session.query(BuildMaster).filter_by(name=unicode(bot)).first()
         if type == STATUS:
@@ -209,15 +211,12 @@ def showclasses(type, bot):
     @type bot: BuildBot
     """
     if type == STEP:
-        dbcls = BuildStep(unicode(path), order)
         cfg = bot.steps
     else:
         if type == STATUS:
-            dbcls = BuildStatus(unicode(path), order)
             cfg = bot.statuses
         else:
             if type == SCHEDULER:
-                dbcls = BuildScheduler(unicode(path), order)
                 cfg = bot.schedulers
             else:
                 Fatal('%s is an invalid type.' % type)

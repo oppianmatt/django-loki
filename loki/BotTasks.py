@@ -23,7 +23,7 @@ from loki import Orm
 from loki.model import Server, BuildBot, BuildMaster, BuildSlave
 from loki.Log import *
 from loki.ModelTasks import listitems, allocserver, allocport, genpasswd
-from loki.StepsTasks import showclasses
+from loki.ConfigTasks import showclasses
 from loki.Colors import Colors
 
 color = Colors()
@@ -242,15 +242,15 @@ def report(name=None):
                  slaves)
     if bot.type == MASTER:
         msg += '  Build Statuses:\n'
-#        msg += bot.statuses
+        msg += showclasses(STATUS, bot)
         msg += '\n'
         msg += '  Build Schedulers:\n'
-#        msg += [scheduler.name for scheduler in bot.schedulers]
+        msg += showclasses(SCHEDULER, bot)
         msg += '\n'
 
     if bot.type == SLAVE:
         msg += '  Build Steps:\n'
-        msg += showclasses(bot)
+        msg += showclasses(STEP, bot)
         msg += '\n'
 
     Log(msg[:-1])

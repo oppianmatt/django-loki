@@ -461,28 +461,30 @@ class BuildBotModule(func_module.FuncModule):
         classes = {}
         for m in modules:
             #y = __import__("%s.%s" % (pkg, m), fromlist=['module'])
-            y = __import__("%s.%s" % (path, m), globals(), locals(), ['module'])
+            y = __import__("%s.%s" % (path, m),
+                           globals(), locals(), ['module'])
             for i in inspect.getmembers(y):
-                if inspect.isclass(i[1]) and \
-                   i[1].__module__.startswith("%s.%s" % (path, m)) and \
-                   not i[0].startswith('_') and \
-                   hasattr(i[1], '__init__'):
+                if inspect.isclass(i[1]) and not i[0].startswith('_')\
+                   and i[1].__module__.startswith("%s.%s" % (path, m))\
+                   and hasattr(i[1], '__init__'):
                     req = []
                     opt = {}
                     i_init = inspect.getargspec(i[1].__init__)
+                    i_init_args = [x for x in reversed(i_init[0][1:])]
+                    if i_init[3] != None:
+                        i_init_defaults = [x for x in reversed(i_init[3])]
                     c = 0
-                    for a in i_init[0]:
-                        if a != 'self':
-                            if i_init[3] == None:
-                                opt[a] = 'LokiNone'
-                            else:
-                                if c < len(i_init[3]):
-                                    if i_init[3][c] == None:
-                                        opt[a] = 'LokiNone'
-                                    else:
-                                        opt[a] = i_init[3][c]
+                    for a in i_init_args:
+                        if i_init[3] == None:
+                            req.append(a)
+                        else:
+                            if c < len(i_init_defaults):
+                                if i_init_defaults[c] == None:
+                                    opt[a] = 'LokiNone'
                                 else:
-                                    req.append(a)
+                                    opt[a] = i_init_defaults[c]
+                            else:
+                                req.append(a)
                         c = c + 1
                     classes[i[0]] = ("%s.%s" % (i[1].__module__, i[0]), req, opt)
         return classes
