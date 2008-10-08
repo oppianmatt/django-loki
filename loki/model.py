@@ -260,11 +260,15 @@ server_properties = {'buildbots': relation(BuildBot, backref='server',
 master_properties = {'slaves': relation(BuildSlave, backref='master',
                                primaryjoin=masters.c.id==slaves.c.master_id),
                      'schedulers': relation(BuildScheduler, backref='master',
-                               primaryjoin=bots.c.id==configs.c.bot_id),
+                               primaryjoin=bots.c.id==configs.c.bot_id,
+                               cascade='all,delete-orphan'),
                      'statuses': relation(BuildStatus, backref='master',
-                               primaryjoin=bots.c.id==configs.c.bot_id)}
+                               primaryjoin=bots.c.id==configs.c.bot_id,
+                               cascade='all,delete-orphan')}
 slave_properties = {'steps': relation(BuildStep, backref='slave',
-                            primaryjoin=bots.c.id==configs.c.bot_id)}
+                            primaryjoin=bots.c.id==configs.c.bot_id,
+                            order_by=configs.c.order,
+                            cascade='all,delete-orphan')}
 step_properties = {'params': relation(BuildParam, backref='step',
                                    primaryjoin=configs.c.id==params.c.configs_id)}
 status_properties = {'params': relation(BuildParam, backref='status',
