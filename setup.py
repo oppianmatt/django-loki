@@ -25,7 +25,9 @@ setup(name = "loki",
                     shenson@redhat.com, \
                     smilner@redhat.com',
 
-    data_files=[('/etc/loki/', ['etc/loki.conf'])],
+    data_files=[('/etc/loki/', ['etc/loki.conf',
+                                'etc/master.cfg.tpl',
+                                'buildbot.tac.tpl'])],
 
     license = __LICENSE__,
 
