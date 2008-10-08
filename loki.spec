@@ -35,7 +35,7 @@ mkdir -p $RPM_BUILD_ROOT/%{_bindir}
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/loki/
 mkdir -p $RPM_BUILD_ROOT/usr/share/loki/users/
 %{__python} setup.py install --skip-build --root $RPM_BUILD_ROOT/
-cp etc/loki.conf $RPM_BUILD_ROOT/%{_sysconfdir}/loki/
+cp etc/* $RPM_BUILD_ROOT/%{_sysconfdir}/loki/
 
 
 %clean
@@ -47,6 +47,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc INSTALL LICENSE AUTHORS COPYING
 # For noarch packages: sitelib
 %config(noreplace) %{_sysconfdir}/loki/loki.conf
+%{_sysconfdir}/loki/*.tpl
 %{python_sitelib}/*
 %attr (0755,root,root) %{_bindir}/*
 
