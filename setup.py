@@ -27,7 +27,7 @@ setup(name = "loki",
 
     data_files=[('/etc/loki/', ['etc/loki.conf',
                                 'etc/master.cfg.tpl',
-                                'buildbot.tac.tpl'])],
+                                'etc/buildbot.tac.tpl'])],
 
     license = __LICENSE__,
 
