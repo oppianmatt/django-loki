@@ -135,7 +135,7 @@ class BuildBot(object):
     Could be a master or a slave
     """
 
-    def __init__(self, name, comment = ''):
+    def __init__(self, name, comment = u''):
         """
         BuildBot class
 

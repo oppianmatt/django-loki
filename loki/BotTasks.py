@@ -59,7 +59,7 @@ def createmaster(name, profile=None, webport=None,
     bot.slave_port = allocport(SLAVE, slaveport, Session)
     bot.slave_passwd = unicode(genpasswd(slavepasswd))
     bot.web_port = allocport(WEB, webport, Session)
-    bot.config_source = u'depricated'
+    bot.config_source = u'loki'
 
     # SQLAlchemy Session... marking where to Rollback to
     # Attempt to Allocate Server and roll back if failure
