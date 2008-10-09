@@ -5,4 +5,6 @@ if [ $? == 0 ]; then
     setfacl -R -m "u:$1:rX" /etc/pki/certmaster/
     setfacl -d -R -m "u:$1:rwX" /var/lib/func
     setfacl -R -m "u:$1:rwX" /var/lib/func
+    setfacl -d -R -m "u:$1:rwX" /var/log/func
+    setfacl -R -m "u:$1:rwX" /var/log/func
 fi
