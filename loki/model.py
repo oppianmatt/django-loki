@@ -21,27 +21,27 @@ metadata = MetaData()
 
 config = Table('config', metadata,
     Column('name', types.Unicode(100), primary_key=True),
-    Column('value', types.Unicode))
+    Column('value', types.Unicode(100)))
 
 servers = Table('servers', metadata,
     Column('id', types.Integer, primary_key=True),
-    Column('name', types.Unicode),
-    Column('profile', types.Unicode),
-    Column('basedir', types.Unicode),
-    Column('type', types.Unicode),
-    Column('comment', types.Unicode))
+    Column('name', types.Unicode(100)),
+    Column('profile', types.Unicode(50)),
+    Column('basedir', types.Unicode(50)),
+    Column('type', types.Unicode(10)),
+    Column('comment', types.Unicode(100)))
 
 bots = Table('buildbots', metadata,
     Column('id', types.Integer, primary_key=True),
     Column('server_id', types.Integer, ForeignKey('servers.id')),
-    Column('name', types.Unicode),
-    Column('type', types.Unicode),
-    Column('comment', types.Unicode))
+    Column('name', types.Unicode(50)),
+    Column('type', types.Unicode(10)),
+    Column('comment', types.Unicode(100)))
 
 masters = Table('masters', metadata,
     Column('id', types.Integer, ForeignKey('buildbots.id'), primary_key=True),
-    Column('config_source', types.Unicode),
-    Column('slave_passwd', types.Unicode),
+    Column('config_source', types.Unicode(100)),
+    Column('slave_passwd', types.Unicode(10)),
     Column('slave_port', types.Integer),
     Column('web_port', types.Integer))
 
@@ -52,15 +52,15 @@ slaves = Table('slaves', metadata,
 configs = Table('configs', metadata,
     Column('id', types.Integer, primary_key=True),
     Column('bot_id', types.Integer, ForeignKey('buildbots.id')),
-    Column('type', types.Unicode),
-    Column('module', types.Unicode),
+    Column('type', types.Unicode(10)),
+    Column('module', types.Unicode(100)),
     Column('order', types.Integer))
 
 params = Table('params', metadata,
     Column('id', types.Integer, primary_key=True),
     Column('configs_id', types.Integer, ForeignKey('configs.id')),
-    Column('name', types.Unicode),
-    Column('value', types.Unicode))
+    Column('name', types.Unicode(50)),
+    Column('value', types.Unicode(50)))
 
 
 class Config(object):
