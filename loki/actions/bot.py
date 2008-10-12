@@ -1,4 +1,6 @@
 from director import Action
+from director.decorators import general_help
+
 from loki import BotTasks, ConfigTasks
 from loki.Common import *
 from loki.Log import *
@@ -11,65 +13,43 @@ class Bot(Action):
 
     description_txt = "Manages Bots"
 
+    @general_help("Lists all bots.",
+                  {'type': 'master or slave'},
+                  ['loki bot list'])
     def list(self, type=BUILDBOT):
         """
         Lists all bots
 
-        == help ==
-        \nOptions:
-        \ttype:\topt\nmaster or slave
-        Example:\tloki bot list
-
-        == end help ==
+        :type is the type we are to list.
         """
         BotTasks.listbots(type)
 
+    @general_help("Prints a bot's details.",
+                  {'name': 'FQDN of a registered server'},
+                  ['tloki server report [--name=example.com]'])
     def report(self, name=None):
         """
         Prints a bot's details
-
-        == help ==
-        \nOptions:
-        \tname:\topt\tFQDN of a registered server
-
-        Example:
-        \tloki server report [--name=server.example.com]
-
-        == end help ==
 
         @param name: the name of an existsing bot
         @type name: str
         """
         BotTasks.report(name)
 
+    @general_help("Creates a new bot",
+                  {'name': 'bot name',
+                   'type': 'type of buildbot (master or slave)',
+                   'master': 'type of buildbot (master or slave)',
+                   'profile': 'server profile to require for bot creation',
+                   'webport': 'port to override autogen of a web port',
+                   'slaveport': 'port to override autogen of a slave port',
+                   'slavepasswd': 'slave password to override autogen'},
+                  ['loki bot create --name=masterbot --type=master',
+                   'loki bot create --name=name --type=slave --master=mastr'])
     def create(self, name, type, master=None,
                profile=None, webport=None, slaveport=None, slavepasswd=None):
         """
         Creates a new bot
-
-        == help ==
-        \nOptions:
-        \tname:\t\treq\tbot name
-        \ttype:\t\treq\ttype of buildbot (master or slave)
-        \tmaster:\t\tre*\ttype of buildbot (master or slave)
-        \tprofile:\topt\tserver profile to require for bot creation
-        \twebport:\top*\tport to override autogen of a web port
-        \tslaveport:\top*\tport to override autogen of a slave port
-        \tslavepasswd:\top*\tpassword to override autogen of a slave password
-        \t\tre* required when type=slave, ignored when type=master
-        \t\top* optional when type=master, ignored when type=slave
-
-        Example:
-        \tloki bot create --name=masterbot
-        \t\t\t--type=master
-        \t\t\t[--profile=os-arch]
-
-        \tloki bot create --name=slavebot
-        \t\t\t--type=slave
-        \t\t\t--master=masterbot
-        \t\t\t[--profile=os-arch]
-
-        == end help ==
 
         @param name: The name of the bot
         @type name: str
@@ -105,38 +85,26 @@ class Bot(Action):
             else:
                 Fatal('invalid bot type, use --type=master or --type=slave')
 
+    @general_help("Deletes a bot.",
+                  {'name': 'name of a bot'},
+                  ['tloki bot delete --name=masterbot'])
     def delete(self, name):
         """
         Deletes a bot
-
-        == help ==
-        \nOptions:
-        \tname:\t\treq\tname of a bot
-
-        Example:
-        \tloki bot delete --name=masterbot
-
-        == end help ==
 
         @param name: the name of an existing bot
         @type name: str
         """
         BotTasks.delete(name)
 
+    @general_help("Starts a bot.",
+                  {'name': 'name of a bot',
+                   'type':' master or slave, stops all of passed type'},
+                  ['loki bot start --name=slavebot',
+                   'loki bot start --type=master'])
     def start(self, name=None, type=None):
         """
         Starts a bot
-
-        == help ==
-        \nOptions:
-        \tname:\treq\tname of a bot
-        \ttype:\treq*\tmaster or slave, stops all of passed type
-
-        Example:
-        \tloki bot start --name=slavebot
-        \tloki bot start --type=master
-
-        == end help ==
 
         @param name: the name of an existing bot
         @type name: str
@@ -148,20 +116,14 @@ class Bot(Action):
         if type != None:
             BotTasks.startall(type=type)
 
+    @general_help("Starts a bot.",
+                  {'name': 'a the name of a bot',
+                   'type': 'master or slave, restarts all of passed type'},
+                  ['loki bot restart --name=botname',
+                   'loki bot restart --type=master'])
     def restart(self, name=None, type=None):
         """
         Restarts a bot
-
-        == help ==
-        \nOptions:
-        \tname:\treq*\ta the name of a bot
-        \ttype:\treq*\tmaster or slave, restarts all of passed type
-        \t\t Either --name or --type is required. --type is \
-ignored if both are passed.
-        Example:
-        \tloki bot restart --name=botname
-        \tloki bot restart --type=master
-        == end help ==
 
         @param name: the name of an exitsting bot
         @type name: str
@@ -173,21 +135,14 @@ ignored if both are passed.
         if type != None:
             BotTasks.restartall(type=type)
 
+    @general_help("Stops a bot.",
+                  {'name': 'a the name of a bot',
+                   'type': 'master or slave, stops all of passed type'},
+                  ['loki bot stop --name=botname',
+                   'loki bot stop --type=slave'])
     def stop(self, name=None, type=None):
         """
         Stop a bot
-
-        == help ==
-        \nOptions:
-        \tname:\treq*\ta the name of a bot
-        \ttype:\treq*\tmaster or slave, stops all of passed type
-        \t\t Either --name or --type is required. --type is ignored \
-if both are passed.
-
-        Example:
-        \tloki bot stop --name=botname
-        \tloki bot stop --type=slave
-        == end help ==
 
         @param name: the name of an existing bot
         @type name: str
@@ -199,51 +154,36 @@ if both are passed.
         if type != None:
             BotTasks.stopall(type=type)
 
+    @general_help("Update a bot.",
+                  {'name': 'a the name of a bot'},
+                  ['loki bot update --name=botname'])
     def update(self, name):
         """
         Update a bot
-
-        == help ==
-        \nOptions:
-        \tname:\treq*\ta the name of a bot
-
-        Example:
-        \tloki bot update --name=botname
-        == end help ==
 
         @param name: the name of an existing bot
         @type name: str
         """
         BotTasks.update(name)
 
+    @general_help("Update and reload a bot.",
+                  {'name': 'a the name of a bot'},
+                  ['loki bot reload --name=botname'])
     def reload(self, name):
         """
         Update and reload a bot
-
-        == help ==
-        \nOptions:
-        \tname:\treq*\ta the name of a bot
-
-        Example:
-        \tloki bot reload --name=botname
-        == end help ==
 
         @param name: the name of an existing bot
         @type name: str
         """
         BotTasks.reload(name)
 
+    @general_help("Generate a bots config.",
+                  {'name': 'name of a bot'},
+                  ['loki bot gen --name=botname'])
     def config(self, name):
         """
         Generate a bots config
-
-        == help ==
-        \nOptions:
-        \tname:\treq\t name of a bot
-
-        Example:
-        \tloki bot gen --name=botname
-        == end help ==
 
         @param name: the name of an existing bot
         @type name: str
