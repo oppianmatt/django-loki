@@ -13,37 +13,22 @@ Global url mappings.
 
 import os
 
+from django.conf import settings
 from django.conf.urls.defaults import *
 
-from views import *
-
-
-# mock the apache django.root option
-# http://www.example.com/loki/
-dr = 'loki/'
-# http://www.example.com/
-#dr=''
+from web.lokiui.views import bot_status, bot_report
 
 #yui info
-yui_path = os.path.join(os.path.dirname(__file__), 'yui')
-yui_path = yui_path.replace('\\', '/')
+YUI_PATH = os.path.join(os.path.dirname(__file__), 'yui').replace('\\', '/')
 
 
 urlpatterns = patterns('',
+    (r'^%sui/' % settings.SITE_ROOT, include('web.lokiui.urls')),
+
     # serve yui files
-    (r'^%syui/(?P<path>.*)$' % dr, 'django.views.static.serve',
-         {'document_root': yui_path}),
+    (r'^%syui/(?P<path>.*)$' % settings.SITE_ROOT, 'django.views.static.serve',
+         {'document_root': YUI_PATH}),
     # entry points for ajax calls
-    (r'^%sjson/botstatus/([a-z]*)/.*' % dr, bot_status),
-    (r'^%sjson/botreport/([a-z]*)/.*'% dr, bot_report),
-
-    # handle views
-    (r'^%s$' % dr, home),
-
-
-    # Example:
-    # (r'^web/', include('web.foo.urls')),
-
-    # Uncomment this for admin:
-#     (r'^admin/', include('django.contrib.admin.urls')),
+    (r'^%sjson/botstatus/([a-z]*)/.*' % settings.SITE_ROOT, bot_status),
+    (r'^%sjson/botreport/([a-z]*)/.*'% settings.SITE_ROOT, bot_report),
 )
