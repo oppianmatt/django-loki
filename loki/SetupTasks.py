@@ -82,7 +82,7 @@ def validateModel(Session, show_warn=True):
 def createSchema():
     # Set up the config parser
     cp = ConfigParser.ConfigParser()
-    setattr(cp, 'file_name', '/etc/loki/loki.conf')
+    setattr(cp, 'file_name', CONFIGFILE)
     cp.read(cp.file_name)
 
     sa_engine = createEngine(cp)
@@ -106,7 +106,7 @@ def createSchema():
 def updateSchema():
     # Set up the config parser
     cp = ConfigParser.ConfigParser()
-    setattr(cp, 'file_name', '/etc/loki/loki.conf')
+    setattr(cp, 'file_name', CONFIGFILE)
     cp.read(cp.file_name)
 
     sa_engine = createEngine(cp)
