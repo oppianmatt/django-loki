@@ -270,13 +270,11 @@ slave_properties = {'steps': relation(BuildStep, backref='slave',
                             order_by=configs.c.order,
                             cascade='all,delete-orphan')}
 step_properties = {'params': relation(BuildParam, backref='step',
-                                   primaryjoin=configs.c.id==params.c.configs_id)}
+                             primaryjoin=configs.c.id==params.c.configs_id)}
 status_properties = {'params': relation(BuildParam, backref='status',
-                                   primaryjoin=configs.c.id==params.c.configs_id)}
+                               primaryjoin=configs.c.id==params.c.configs_id)}
 scheduler_properties = {'params': relation(BuildParam, backref='scheduler',
-                                   primaryjoin=configs.c.id==params.c.configs_id)}
-
-
+                        primaryjoin=configs.c.id==params.c.configs_id)}
 
 
 ConfigMapper = mapper(Config, config)
