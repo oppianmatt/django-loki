@@ -498,7 +498,7 @@ def _template(tpl, **vars):
 
 
 def _generate_class(cls):
-   gcls = cls.module.split('.')[-1]
-   gprm = ["%s=%s" % (param.name, param.value) for param in cls.params]
-   return "%s(%s)"% (gcls,\
-                     ', '.join(gprm))
+    gcls = cls.module.split('.')[-1]
+    gprm = ["%s=%s" % (param.name, param.value) for param in cls.params]
+    return "%s(%s)"% (gcls,\
+                      ', '.join(gprm))

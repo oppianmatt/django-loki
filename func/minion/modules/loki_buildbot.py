@@ -272,7 +272,8 @@ class BuildBotModule(func_module.FuncModule):
         pidfile = "%s/twistd.pid" % bot
         if os.path.exists(pidfile):
             pid = open(pidfile).readline().strip()
-            if self.oscmd.run_command("ps %s > /dev/null" % pid, allow_except=False) is True:
+            if self.oscmd.run_command("ps %s > /dev/null" % pid,
+                                      allow_except=False) is True:
                 return True
         return False
 
@@ -486,7 +487,9 @@ class BuildBotModule(func_module.FuncModule):
                             else:
                                 req.append(a)
                         c = c + 1
-                    classes[i[0]] = ("%s.%s" % (i[1].__module__, i[0]), req, opt)
+                    classes[i[0]] = ("%s.%s" % (i[1].__module__, i[0]),
+                                     req,
+                                     opt)
         return classes
 
 

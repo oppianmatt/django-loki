@@ -214,7 +214,7 @@ def __check_func(value):
 
 def config(bot, data):
     """
-    Push a config   
+    Push a config
 
     @param bot: The bot you wish to write config to
     @type bot: SQLAlchemy Model
@@ -227,8 +227,8 @@ def config(bot, data):
     #directory exists so push the config
     rbot = getbot(bot)
     rpath = getpath(bot=bot)
-    f = tmpfile()   
-    f.write(data)   
+    f = tmpfile()
+    f.write(data)
     f.seek(0)
     data = xmlrpclib.Binary(f.read())
     if bot.type == MASTER:
