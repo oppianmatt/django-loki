@@ -60,11 +60,11 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'loki.web.urls'
 
-#import os
+import os
 
-#TEMPLATE_DIRS = (
-#    os.path.join(os.path.dirname(__file__), 'templates').replace('\\', '/'),
-#)
+TEMPLATE_DIRS = (
+    os.path.join(os.path.dirname(__file__), 'templates').replace('\\', '/'),
+)
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -72,4 +72,16 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'web.lokiui',
+    'web.xmlrpc',
 )
+
+# Import all application specific settings
+for APP in INSTALLED_APPS:
+    if APP[:6] != 'django':
+        # import locally, not from the global path
+        APP_IMPORT = APP[APP.index(".") + 1:]
+        try:
+            exec("from %s.settings import *" % APP_IMPORT)
+        except ImportError, ie:
+            # Not every application has it's own settings
+            pass
