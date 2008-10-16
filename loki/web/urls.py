@@ -24,6 +24,7 @@ YUI_PATH = os.path.join(os.path.dirname(__file__), 'yui').replace('\\', '/')
 
 urlpatterns = patterns('',
     (r'^%sui/' % settings.SITE_ROOT, include('web.lokiui.urls')),
+    (r'^%sservice/xmlrpc/' % settings.SITE_ROOT, include('web.xmlrpc.urls')),
 
     # serve yui files
     (r'^%syui/(?P<path>.*)$' % settings.SITE_ROOT, 'django.views.static.serve',
