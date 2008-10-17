@@ -122,6 +122,8 @@ def get(name=None):
     else:
         servers = Session.query(Server).all()
 
+    return servers
+
 
 def report(name=None):
     """

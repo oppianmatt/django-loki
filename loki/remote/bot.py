@@ -14,26 +14,12 @@ functions that handle remote connections over func
 and execute tasks remotely
 """
 
-import func.overlord.client as fc
 import types
 import xmlrpclib
 from os import tmpfile
 from loki.Log import Fatal
-from Common import *
-
-
-
-def getminion(host):
-    """
-    Gets the func client connection for the host
-
-    @param host: The host to return the connection to
-    @type host: string
-
-    @return: A func client
-    @rtype: func.overlord.client.Overload
-    """
-    return fc.Overlord(host, noglobs=True)
+from loki.Common import *
+from loki.remote.server import getminion
 
 
 def getbot(bot):

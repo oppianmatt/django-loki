@@ -15,6 +15,19 @@ and execute tasks remotely
 import func.overlord.client as fc
 
 
+def getminion(host):
+    """
+    Gets the func client connection for the host
+
+    @param host: The host to return the connection to
+    @type host: string
+
+    @return: A func client
+    @rtype: func.overlord.client.Overload
+    """
+    return fc.Overlord(host, noglobs=True)
+
+
 def status(server):
     """
     Pings a server to be sure func is running
@@ -25,5 +38,5 @@ def status(server):
     @return: True or false
     @rtype: Boolean
     """
-    m = loki.CommonTasks.getminion(server)
+    m = getminion(server.name)
     return m.test.ping()

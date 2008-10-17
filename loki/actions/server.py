@@ -1,7 +1,9 @@
 import loki.server
+import loki.remote.server
 from director import Action
 from director.decorators import general_help
-
+from loki.Common import *
+from loki.Colors import Colors
 
 class Server(Action):
     """
@@ -20,10 +22,10 @@ class Server(Action):
             Fatal("No Servers found.")
         msg = ""
         for server in servers:
-            status = color.format_string("off", "red")
-            if server.status() == True:
-                status = color.format_string("on", "green")
-            msg += "%s (%s).... %s\n" % (color.format_string(server.name, 'blue'),
+            status = Colors().format_string("off", "red")
+            if loki.remote.server.status(server) == True:
+                status = Colors().format_string("on", "green")
+            msg += "%s (%s).... %s\n" % (Colors().format_string(server.name, 'blue'),
                                          server.profile,
                                          status)
         Log(msg[:-1])
