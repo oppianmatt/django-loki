@@ -27,15 +27,8 @@ from loki.model import BuildStep
 from loki.model import BuildStatus
 from loki.model import BuildScheduler
 from loki.model import BuildParam
-from loki.Log import *
-from loki.ModelTasks import listitems
-from loki.ModelTasks import allocserver
-from loki.ModelTasks import allocport
-from loki.ModelTasks import genpasswd
 from loki.Colors import Colors
 
-color = Colors()
-Session = Orm().session
 
 
 def list(type, master=None, path=None):

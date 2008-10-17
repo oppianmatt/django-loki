@@ -1,16 +1,17 @@
 from director import Action
 from director.decorators import general_help
 
-from loki import BotTasks, ConfigTasks
+import loki.bot
+import loki.remote.bot
+import loki.config
+from loki.Colors import Colors
 from loki.Common import *
-from loki.Log import *
 
 
 class Bot(Action):
     """
     loki bot actions
     """
-
     description_txt = "Manages Bots"
 
     @general_help("Lists all bots.",
@@ -20,9 +21,25 @@ class Bot(Action):
         """
         Lists all bots
 
-        :type is the type we are to list.
+        @param type: Optional type of bot to filter by
+        @type type: str
         """
-        BotTasks.listbots(type)
+        bots = loki.bot.get()
+        if len(bots) == 0 and type == BUILDBOT:
+            Fatal("No Bots found.")
+        if len(bots) == 0:
+            Fatal("No %s Bots found." % type)
+
+        for bot in bots:
+            status = Colors().format_string("off", "red")
+            if loki.remote.bot.status(bot) is True:
+                status = Colors().format_string("on", "green")
+            msg = "%s: %s .... %s\n" % \
+                  (Colors().format_string(bot.name, "white"),
+                   Colors().format_string(bot.server.name, 'blue'),
+                   status)
+            Log(msg[:-1])
+
 
     @general_help("Prints a bot's details.",
                   {'name': 'FQDN of a registered server'},
@@ -34,7 +51,62 @@ class Bot(Action):
         @param name: the name of an existsing bot
         @type name: str
         """
-        BotTasks.report(name)
+        if name == None:
+            bots = loki.bot.get()
+        else:
+            bots = []
+            bots.append(loki.bot.get(name=name))
+        msg = "\n"
+        masters = ''
+        slaves = ''
+        for bot in bots:
+            status = Colors().format_string("off", "red")
+            if loki.remote.bot.status(bot) is True:
+                status = Colors().format_string("on", "green")
+            if bot.server.type == MASTER:
+                masters += "%s: %s\n\tServer: %s\n\tType: %s\n\tProfile: %s\
+                        \n\tSlave/Web Port: %s/%s\n\tSlave Passwd: %s\n" % \
+                      (Colors().format_string(bot.name, "blue"),
+                       status,
+                       bot.server.name,
+                       bot.server.type,
+                       bot.server.profile,
+                       bot.slave_port,
+                       bot.web_port,
+                       bot.slave_passwd)
+            if bot.server.type == SLAVE:
+                 slaves += "%s: %s\n\tServer: %s\n\tType: %s\
+                            \n\tMaster: %s\n\tProfile: %s\n" %\
+                           (Colors().format_string(bot.name, "blue"),
+                            status,
+                            bot.server.name,
+                            bot.server.type,
+                            bot.master,
+                            bot.server.profile)
+
+        if name != None:
+            msg += "%s%s\n" % (masters, slaves)
+        else:
+            msg += "%s\n\n%s\n%s\n\n%s\n" % \
+                (Colors().format_string("Masters:", "white"),
+                 masters,
+                 Colors().format_string("Slaves:", "white"),
+                 slaves)
+        if bot.type == MASTER:
+            msg += '  Build Statuses:\n'
+            msg += loki.config.showclasses(STATUS, bot)
+            msg += '\n'
+            msg += '  Build Schedulers:\n'
+            msg += loki.config.showclasses(SCHEDULER, bot)
+            msg += '\n'
+
+        if bot.type == SLAVE:
+            msg += '  Build Steps:\n'
+            msg += loki.config.showclasses(STEP, bot)
+            msg += '\n'
+
+        Log(msg[:-1])
+
 
     @general_help("Creates a new bot",
                   {'name': 'bot name',

@@ -16,17 +16,13 @@ else and actually get something done.
 
 import os
 import time
-import loki.RemoteTasks as RemoteTasks
 
 from loki.Common import *
 from loki import Orm
 from loki.model import Server, BuildBot, BuildMaster, BuildSlave
 from loki.Log import *
-from loki.ModelTasks import listitems, allocserver, allocport, genpasswd
-from loki.ConfigTasks import showclasses
 from loki.Colors import Colors
 
-color = Colors()
 Session = Orm().session
 
 
@@ -166,95 +162,28 @@ def delete(name):
     Success('BuildBot %s Deleted.' % name)
 
 
-def listbots(type=BUILDBOT):
+def get(type=BUILDBOT, name=None):
     """
-    Lists all bots
+    get bot objects
 
     @param type: Optional type of bot to filter by
     @type type: str
-    """
-    bots = listitems(type, Session)
-    if bots is None and type == None:
-        Fatal("No Bots found.")
-    if bots is None:
-        Fatal("No %s Bots found." % type)
 
-    for bot in bots:
-        status = color.format_string("off", "red")
-        if RemoteTasks.status(bot) is True:
-            status = color.format_string("on", "green")
-        msg = "%s: %s .... %s\n" % \
-        (color.format_string(bot.name, "white"),
-        color.format_string(bot.server.name, 'blue'),
-        status)
-        Log(msg[:-1])
-
-    return True
-
-
-def report(name=None):
-    """
-    Restarts a master or slave.
-
-    @param name: Name of the bot
+    @param name: Optional name of bot to filter by
     @type name: str
     """
-    if name != None:
-        bots = Session.query(BuildBot).filter_by(name=unicode(name)).all()
+
+    if type == BUILDBOT:
+        qry =  Session.query(BuildBot)
+    if type == MASTER:
+        qry =  Session.query(BuildMaster)
+    if type == SLAVE:
+        qry =  Session.query(BuildSlave)
+    
+    if name == None:
+        return qry.all()
     else:
-        bots = listitems(BUILDBOT, Session)
-
-    msg = "\n"
-    masters = ''
-    slaves = ''
-    for bot in bots:
-        status = color.format_string("off", "red")
-        if RemoteTasks.status(bot) is True:
-            status = color.format_string("on", "green")
-        if bot.server.type == MASTER:
-            masters += "%s: %s\n\tServer: %s\n\tType: %s\n\tProfile: %s\
-                    \n\tSlave/Web Port: %s/%s\n\tSlave Passwd: %s\n" % \
-            (color.format_string(bot.name, "blue"),
-             status,
-             bot.server.name,
-             bot.server.type,
-             bot.server.profile,
-             bot.slave_port,
-             bot.web_port,
-             bot.slave_passwd)
-        if bot.server.type == SLAVE:
-            slaves += "%s: %s\n\tServer: %s\n\tType: %s\
-                       \n\tMaster: %s\n\tProfile: %s\n" %\
-            (color.format_string(bot.name, "blue"),
-             status,
-             bot.server.name,
-             bot.server.type,
-             bot.master,
-             bot.server.profile)
-
-    if name != None:
-        msg += "%s%s\n" % (masters, slaves)
-    else:
-        msg += "%s\n\n%s\n%s\n\n%s\n" % \
-                (color.format_string("Masters:", "white"),
-                 masters,
-                 color.format_string("Slaves:", "white"),
-                 slaves)
-    if bot.type == MASTER:
-        msg += '  Build Statuses:\n'
-        msg += showclasses(STATUS, bot)
-        msg += '\n'
-        msg += '  Build Schedulers:\n'
-        msg += showclasses(SCHEDULER, bot)
-        msg += '\n'
-
-    if bot.type == SLAVE:
-        msg += '  Build Steps:\n'
-        msg += showclasses(STEP, bot)
-        msg += '\n'
-
-    Log(msg[:-1])
-    return True
+        return qry.filter_by(name=unicode(name)).first()
 
 
 def start(name):
