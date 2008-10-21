@@ -16,9 +16,9 @@ import types
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from loki import Orm
-from loki.ModelTasks import listitems
-from loki.ModelTasks import getbot
-from loki.RemoteTasks import status
+from loki.bot import get as bot_get
+from loki.server import get as server_get
+from loki.remote.bot import getbot, status
 from django.utils import simplejson
 from loki.Common import *
 
@@ -47,8 +47,8 @@ def home(request):
     """
     TODO: Document me.
     """
-    masters = listitems(MASTER, Session)
-    slaves = listitems(SLAVE, Session)
+    masters = bot_get(MASTER, Session)
+    slaves = bot_get(SLAVE, Session)
     return render_to_response('home.html', locals())
 
 

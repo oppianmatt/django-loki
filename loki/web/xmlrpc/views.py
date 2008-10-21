@@ -65,7 +65,7 @@ def health(auth):
     all.update(libs)
 
     # check access requirements
-    access = {'ssh key repo perms':  False}
+    access = {'ssh key repo perms': False}
     if os.access(settings.XMLRPC_SSHKEY_REPO, os.W_OK):
         access['ssh key repo perms'] = True
     all.update(access)
