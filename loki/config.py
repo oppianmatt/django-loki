@@ -10,12 +10,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 """
-ConfigTasks - handles config objects for bots
+Config API - handles config objects for bots
 """
 
 import os
 import time
-import loki.RemoteTasks as RemoteTasks
 
 from loki.Common import *
 from loki import Orm
@@ -27,15 +26,8 @@ from loki.model import BuildStep
 from loki.model import BuildStatus
 from loki.model import BuildScheduler
 from loki.model import BuildParam
-from loki.Log import *
-from loki.ModelTasks import listitems
-from loki.ModelTasks import allocserver
-from loki.ModelTasks import allocport
-from loki.ModelTasks import genpasswd
 from loki.Colors import Colors
 
-color = Colors()
-Session = Orm().session
 
 
 def list(type, master=None, path=None):
@@ -60,7 +52,7 @@ def list(type, master=None, path=None):
 
     msg = ""
     for server in servers:
-        clses = RemoteTasks.getclasses(server, path)
+        clses = loki.remote.server.getclasses(server, path)
         msg += "%s:\n" % color.format_string(server.name, "blue")
         for cls in clses:
             msg += "\t%s: %s\n" % (
@@ -111,7 +103,7 @@ def add(type, bot, path, order):
 
     #load the class and get parameters
     clsname = path.split('.')[-1]
-    clses = RemoteTasks.getclasses(master,
+    clses = loki.remote.server.getclasses(master,
                                  '.'.join(path.split('.')[:-1]))
     cls_dict = {}
 

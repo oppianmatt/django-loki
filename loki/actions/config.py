@@ -1,9 +1,16 @@
+# Copyright 2008, Red Hat, Inc
+# Dan Radez <dradez@redhat.com>
+#
+# This software may be freely redistributed under the terms of the GNU
+# general public license.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+import loki.config
 from director import Action
 from director.decorators import general_help
-
-from loki import ConfigTasks
 from loki.Common import *
-from loki.Log import *
 
 
 class Config(Action):
@@ -20,7 +27,7 @@ class Config(Action):
         """
         Lists master's steps
         """
-        ConfigTasks.list(type, master, path)
+        loki.config.list(type, master, path)
 
     @general_help("Add a build config to a bot.",
                   {'bot': 'Bot name',
@@ -32,7 +39,7 @@ class Config(Action):
         """
         Add a build config to a bot.
         """
-        ConfigTasks.add(type, bot, module, order)
+        loki.config.add(type, bot, module, order)
 
     @general_help("Add a build config to a bot.",
                   {'bot': 'Bot name',
@@ -43,4 +50,4 @@ class Config(Action):
         """
         Delete a build config from a bot
         """
-        ConfigTasks.delete(type, bot, order)
+        loki.config.delete(type, bot, order)

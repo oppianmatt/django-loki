@@ -1,16 +1,26 @@
+# Copyright 2008, Red Hat, Inc
+# Dan Radez <dradez@redhat.com>
+#
+# This software may be freely redistributed under the terms of the GNU
+# general public license.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 from director import Action
 from director.decorators import general_help
 
-from loki import BotTasks, ConfigTasks
+import loki.bot
+import loki.remote.bot
+import loki.config
+from loki.Colors import Colors
 from loki.Common import *
-from loki.Log import *
 
 
 class Bot(Action):
     """
     loki bot actions
     """
-
     description_txt = "Manages Bots"
 
     @general_help("Lists all bots.",
@@ -20,9 +30,25 @@ class Bot(Action):
         """
         Lists all bots
 
-        :type is the type we are to list.
+        @param type: Optional type of bot to filter by
+        @type type: str
         """
-        BotTasks.listbots(type)
+        bots = loki.bot.get()
+        if len(bots) == 0 and type == BUILDBOT:
+            Fatal("No Bots found.")
+        if len(bots) == 0:
+            Fatal("No %s Bots found." % type)
+
+        for bot in bots:
+            status = Colors().format_string("off", "red")
+            if loki.remote.bot.status(bot) is True:
+                status = Colors().format_string("on", "green")
+            msg = "%s: %s .... %s\n" % \
+                  (Colors().format_string(bot.name, "white"),
+                   Colors().format_string(bot.server.name, 'blue'),
+                   status)
+            Log(msg[:-1])
+
 
     @general_help("Prints a bot's details.",
                   {'name': 'FQDN of a registered server'},
@@ -34,7 +60,62 @@ class Bot(Action):
         @param name: the name of an existsing bot
         @type name: str
         """
-        BotTasks.report(name)
+        if name == None:
+            bots = loki.bot.get()
+        else:
+            bots = []
+            bots.append(loki.bot.get(name=name))
+        msg = "\n"
+        masters = ''
+        slaves = ''
+        for bot in bots:
+            status = Colors().format_string("off", "red")
+            if loki.remote.bot.status(bot) is True:
+                status = Colors().format_string("on", "green")
+            if bot.server.type == MASTER:
+                masters += "%s: %s\n\tServer: %s\n\tType: %s\n\tProfile: %s\
+                        \n\tSlave/Web Port: %s/%s\n\tSlave Passwd: %s\n" % \
+                      (Colors().format_string(bot.name, "blue"),
+                       status,
+                       bot.server.name,
+                       bot.server.type,
+                       bot.server.profile,
+                       bot.slave_port,
+                       bot.web_port,
+                       bot.slave_passwd)
+            if bot.server.type == SLAVE:
+                 slaves += "%s: %s\n\tServer: %s\n\tType: %s\
+                            \n\tMaster: %s\n\tProfile: %s\n" %\
+                           (Colors().format_string(bot.name, "blue"),
+                            status,
+                            bot.server.name,
+                            bot.server.type,
+                            bot.master,
+                            bot.server.profile)
+
+        if name != None:
+            msg += "%s%s\n" % (masters, slaves)
+        else:
+            msg += "%s\n\n%s\n%s\n\n%s\n" % \
+                (Colors().format_string("Masters:", "white"),
+                 masters,
+                 Colors().format_string("Slaves:", "white"),
+                 slaves)
+        if bot.type == MASTER:
+            msg += '  Build Statuses:\n'
+            msg += loki.config.showclasses(STATUS, bot)
+            msg += '\n'
+            msg += '  Build Schedulers:\n'
+            msg += loki.config.showclasses(SCHEDULER, bot)
+            msg += '\n'
+
+        if bot.type == SLAVE:
+            msg += '  Build Steps:\n'
+            msg += loki.config.showclasses(STEP, bot)
+            msg += '\n'
+
+        Log(msg[:-1])
+
 
     @general_help("Creates a new bot",
                   {'name': 'bot name',
@@ -77,13 +158,22 @@ class Bot(Action):
         @type slavepasswd: str
         """
         if type == MASTER:
-            BotTasks.createmaster(name, profile, webport,
-                                  slaveport, slavepasswd)
+            try:
+                loki.bot.createmaster(name, profile, webport,
+                                      slaveport, slavepasswd)  
+            except Exception, ex:
+                Fatal(ex)
+            Success('Build Master %s Created.\n' % name)
         else:
             if type == SLAVE:
-                BotTasks.createslave(name, master, profile)
+                try:
+                    loki.bot.createslave(name, master, profile)
+                except Exception, ex:
+                    Fatal(ex)
+                Success('Build Slave %s Created.\n' % name)
             else:
                 Fatal('invalid bot type, use --type=master or --type=slave')
+
 
     @general_help("Deletes a bot.",
                   {'name': 'name of a bot'},
@@ -95,7 +185,8 @@ class Bot(Action):
         @param name: the name of an existing bot
         @type name: str
         """
-        BotTasks.delete(name)
+        loki.bot.delete(name)
+        Success('BuildBot %s Deleted.' % name)
 
     @general_help("Starts a bot.",
                   {'name': 'name of a bot',
@@ -112,9 +203,9 @@ class Bot(Action):
         if name == None and type == None:
             Fatal("You must pass --name or --type")
         if name != None:
-            BotTasks.start(name)
+            loki.bot.start(name)
         if type != None:
-            BotTasks.startall(type=type)
+            loki.bot.startall(type=type)
 
     @general_help("Starts a bot.",
                   {'name': 'a the name of a bot',
@@ -131,9 +222,9 @@ class Bot(Action):
         if name == None and type == None:
             Fatal("You must pass --name or --type")
         if name != None:
-            BotTasks.restart(name)
+            loki.bot.restart(name)
         if type != None:
-            BotTasks.restartall(type=type)
+            loki.bot.restartall(type=type)
 
     @general_help("Stops a bot.",
                   {'name': 'a the name of a bot',
@@ -150,9 +241,9 @@ class Bot(Action):
         if name == None and type == None:
             Fatal("You must pass --name or --type")
         if name != None:
-            BotTasks.stop(name)
+            loki.bot.stop(name)
         if type != None:
-            BotTasks.stopall(type=type)
+            loki.bot.stopall(type=type)
 
     @general_help("Update a bot.",
                   {'name': 'a the name of a bot'},
@@ -164,7 +255,7 @@ class Bot(Action):
         @param name: the name of an existing bot
         @type name: str
         """
-        BotTasks.update(name)
+        loki.bot.update(name)
 
     @general_help("Update and reload a bot.",
                   {'name': 'a the name of a bot'},
@@ -176,7 +267,7 @@ class Bot(Action):
         @param name: the name of an existing bot
         @type name: str
         """
-        BotTasks.reload(name)
+        loki.bot.reload(name)
 
     @general_help("Generate a bots config.",
                   {'name': 'name of a bot'},
@@ -188,4 +279,7 @@ class Bot(Action):
         @param name: the name of an existing bot
         @type name: str
         """
-        BotTasks.generate_config(name)
+        if loki.bot.generate_config(name)
+            Success('Config updated.')
+        else:
+            Success('Config unchanged.')

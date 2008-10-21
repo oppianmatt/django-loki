@@ -1,7 +1,16 @@
+# Copyright 2008, Red Hat, Inc
+# Dan Radez <dradez@redhat.com>
+#
+# This software may be freely redistributed under the terms of the GNU
+# general public license.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+import loki.store
 from director import Action
 from director.decorators import general_help
 
-from loki import SetupTasks
 
 
 class Store(Action):
@@ -16,11 +25,11 @@ class Store(Action):
         """
         Setup the Database Schema.
         """
-        SetupTasks.createSchema()
+        loki.store.createSchema()
 
     @general_help("Setup the Database Schema.", examples=['loki store update'])
     def update(self):
         """
         Update the Database Schema.
         """
-        SetupTasks.updateSchema()
+        loki.store.updateSchema()

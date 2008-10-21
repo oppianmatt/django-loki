@@ -1,9 +1,18 @@
+# Copyright 2008, Red Hat, Inc
+# Dan Radez <dradez@redhat.com>
+#
+# This software may be freely redistributed under the terms of the GNU
+# general public license.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+import loki.server
+import loki.remote.server
 from director import Action
 from director.decorators import general_help
-
-from loki import ServerTasks
-from loki import ConfigTasks
-
+from loki.Common import *
+from loki.Colors import Colors
 
 class Server(Action):
     """
@@ -17,7 +26,18 @@ class Server(Action):
         """
         Lists all servers.
         """
-        ServerTasks.listservers()
+        servers = loki.server.get()
+        if len(servers) == 0:
+            Fatal("No Servers found.")
+        msg = ""
+        for server in servers:
+            status = Colors().format_string("off", "red")
+            if loki.remote.server.status(server) == True:
+                status = Colors().format_string("on", "green")
+            msg += "%s (%s).... %s\n" % (Colors().format_string(server.name, 'blue'),
+                                         server.profile,
+                                         status)
+        Log(msg[:-1])
 
     @general_help('Prints server details',
                   {'name': 'FQDN of a registered server'},
@@ -29,7 +49,37 @@ class Server(Action):
         @param name: The FQDN of a registered server
         @type name: str
         """
-        ServerTasks.report(name)
+        if name != None:
+            servers = loki.server.get(name=unicode(name))
+        else:
+            servers = loki.server.get()
+
+        msg = '\n'
+        for server in servers:
+            status = color.format_string("off", "red")
+            m = loki.remote.server.getminion(server.name)
+            if m.test.ping() == 1:
+                status = color.format_string("on", "green")
+
+            bots = ''
+            for bot in server.buildbots:
+                bots += "\t%s\n" % bot.name
+
+            msg += "%s: %s\n\tBots Type: %s\n\tProfile: %s\
+                    \n\tBase Dir: %s\n\tComment: %s\n    %ss:\n%s\n" % \
+                  (color.format_string(server.name, 'blue'),
+                   status,
+                   server.type,
+                   server.profile,
+                   server.basedir,
+                   server.comment,
+                   server.type.capitalize(),
+                   bots)
+        if msg == '\n':
+            Fatal('No Servers Found')
+
+        Log(msg[:-1])
+
 
     @general_help('Registers a new server',
                   {'name': 'FQDN of the server',
@@ -61,7 +111,8 @@ class Server(Action):
         @param comment: an optional comment
         @type comment: str
         """
-        ServerTasks.register(name, basedir, type, profile, comment)
+        loki.server.register(name, basedir, type, profile, comment)
+        Success('Server %s registered' % name)
 
     @general_help('Unregisters a new server',
                   {'name': 'the FQDN of a registered server',
@@ -75,7 +126,8 @@ class Server(Action):
         @param name: the FQDN of a registered server
         @type name: str
         """
-        ServerTasks.unregister(name, delete_bots)
+        loki.server.unregister(name, delete_bots)
+        Success('Server %s unregistered' % name)
 
     @general_help('Starts all bots on a server',
                   {'name': 'the FQDN of a registered server'},
@@ -87,7 +139,7 @@ class Server(Action):
         @param name: the FQDN of a registered server
         @type name: str
         """
-        ServerTasks.startall(name)
+        loki.server.startall(name)
 
     @general_help('Restarts all bots on a server',
                   {'name': 'the FQDN of a registered server'},
@@ -99,7 +151,7 @@ class Server(Action):
         @param name: the FQDN of a registered server
         @type name: str
         """
-        ServerTasks.restart(name)
+        loki.server.restart(name)
 
     @general_help('Stops all bots on a server',
                   {'name': 'the FQDN of a registered server'},
@@ -111,7 +163,7 @@ class Server(Action):
         @param name: the FQDN of a registered server
         @type name: str
         """
-        ServerTasks.stopall(name)
+        loki.server.stopall(name)
 
     @general_help('Generates an html file listing masters',
                   examples=['loki server genhome'])
@@ -120,4 +172,4 @@ class Server(Action):
         Generates an html file listing masters
         and giving links to their ports
         """
-        ConfigTasks.generate_home_page()
+        loki.config.generate_home_page()

@@ -3,7 +3,6 @@ Classes related to running commands locally on a Linux box.
 """
 import os
 import popen2
-from loki.Log import *
 
 # TODO: change the buildbot commands to use the buildbot libs
 

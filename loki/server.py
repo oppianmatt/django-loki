@@ -1,7 +1,7 @@
 # Copyright 2008, Red Hat, Inc
+# Dan Radez <dradez@redhat.com>
 # Steve 'Ashcrow' Milner <smilner@redhat.com>
 # Scott Henson <shenson@redhat.com>
-# Dan Radez <dradez@redhat.com>
 #
 # This software may be freely redistributed under the terms of the GNU
 # general public license.
@@ -10,26 +10,21 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 """
-Server Tasks - These are the actual things that will wrap together everything
-else and actually get something done with servers.
+Server API - work with servers
 """
 
 import os
 import time
-import loki.CommonTasks
-import loki.ConfigTasks
-import loki.ModelTasks
-import loki.RemoteTasks
-import loki.BotTasks
+import string
+
+from random import choice
+from sqlalchemy.sql import select
+from sqlalchemy.sql import func
 
 from loki import Orm
 from loki.model import Server, BuildBot, BuildMaster, BuildSlave
 from loki.Colors import Colors
-from loki.Log import *
 from loki.Common import *
-
-color = Colors()
-Session = Orm().session
 
 
 def register(name, basedir, type, profile, comment=''):
@@ -52,27 +47,27 @@ def register(name, basedir, type, profile, comment=''):
     @type comment: str
     """
 
-    server = Session.query(Server).filter_by(name=unicode(name)).first()
+    server = get(name=unicode(name))
     if server != None:
-        Fatal('Server %s already exists' % name)
+        raise(Exception('Server %s already exists' % name))
 
     server = Server(name, profile, basedir, type, comment)
 
-    Session.save(server)
-    m = loki.CommonTasks.getminion(server.name)
+    Orm().session.save(server)
+    m = loki.remote.server.getminion(server.name)
 
     try:
         if m.test.ping() != 1:
             raise(Exception('No response from server/func.'))
     except Exception, ex:
-        Session.rollback()
-        Session.remove()
-        Fatal('Server %s Registration Failed.\n%s' % \
+        Orm().session.rollback()
+        Orm().session.remove()
+        raise(Exception('Server %s Registration Failed.\n%s' % \
              (server.name, '$ func %s ping failed\nError: %s' % \
-             (server.name, ex)))
+             (server.name, ex))))
 
-    Session.commit()
-    Success('Server %s registered.' % server.name)
+    Orm().session.commit()
+    return True
 
 
 def unregister(name, delete_bots=False):
@@ -82,17 +77,17 @@ def unregister(name, delete_bots=False):
     @param name: the FQDN of a registered server
     @type name: str
     """
-    server = Session.query(Server).filter_by(name=unicode(name)).first()
+    server = get(name=unicode(name))
 
     if server is None:
-        Fatal('Server %s does not exist.' % name)
+        raise(Exception('Server %s does not exist.' % name))
 
-    masters = Session.query(BuildMaster).filter_by(
+    masters = Orm().session.query(BuildMaster).filter_by(
                   server_id=unicode(server.id)).all()
     if masters != []:
         if delete_bots:
             for master in masters:
-                loki.BotTasks.delete(master.name)
+                loki.loki.bot.delete(master.name)
         else:
             raise(Exception("Master Bots exist, use --delete-bots to force"))
     slaves = Session.query(BuildSlave).filter_by(
@@ -100,54 +95,19 @@ def unregister(name, delete_bots=False):
     if slaves != None:
         if delete_bots:
             for slave in slaves:
-                loki.BotTasks.delete(slave.name)
+                loki.loki.bot.delete(slave.name)
         else:
             raise(Exception("Slave Bots exists, use --delete-bots to force"))
 
-    Session.delete(server)
-    Session.commit()
+    Orm().session.delete(server)
+    Orm().session.commit()
 
-    Success('Server %s unregistered.' % name)
-
-
-def listservers():
-    """
-    Lists all known servers.
-
-    @param option: Option instance that's calling the callback.
-    @type option: Option
-
-    @param opt: Option string passed in.
-    @type opt: str
-
-    @param value: The value passed in for the option.
-    @type value: str
-
-    @param parser: The optiona parser intance.
-    @type parser: OptionParser
-
-    @param Session: SQLAlchemy Session
-    @type Session: SQLAlchemy ORM Session Object
-    """
-    servers = loki.ModelTasks.listitems(SERVER, Session)
-    if len(servers) == 0:
-        Fatal("No Servers found.")
-    msg = ""
-    for server in servers:
-        status = color.format_string("off", "red")
-        m = loki.CommonTasks.getminion(server.name)
-        if m.test.ping() == 1:
-            status = color.format_string("on", "green")
-        msg += "%s (%s).... %s\n" % (color.format_string(server.name, 'blue'),
-                                     server.profile,
-                                     status)
-    Log(msg[:-1])
     return True
 
 
-def report(name=None):
+def get(name=None):
     """
-    Reports server Details
+    Lists all the servers
 
     @param name: the FQDN of a registered server
     @type name: str
@@ -155,34 +115,9 @@ def report(name=None):
     if name != None:
         servers = Session.query(Server).filter_by(name=unicode(name)).all()
     else:
-        servers = loki.ModelTasks.listitems(SERVER, Session)
+        servers = Session.query(Server).all()
 
-    msg = '\n'
-    for server in servers:
-        status = color.format_string("off", "red")
-        m = loki.CommonTasks.getminion(server.name)
-        if m.test.ping() == 1:
-            status = color.format_string("on", "green")
-
-        bots = ''
-        for bot in server.buildbots:
-            bots += "\t%s\n" % bot.name
-
-        msg += "%s: %s\n\tBots Type: %s\n\tProfile: %s\
-                \n\tBase Dir: %s\n\tComment: %s\n    %ss:\n%s\n" % \
-              (color.format_string(server.name, 'blue'),
-               status,
-               server.type,
-               server.profile,
-               server.basedir,
-               server.comment,
-               server.type.capitalize(),
-               bots)
-    if msg == '\n':
-        Fatal('No Servers Found')
-
-    Log(msg[:-1])
-    return True
+    return servers
 
 
 def restartall(name):
@@ -201,7 +136,7 @@ def restartall(name):
         Fatal("No Buildbots attached to server %s." % server.name)
 
     for bot in bots:
-        BotTasks.restart(bot.name)
+        loki.bot.restart(bot.name)
 
     Success('Complete')
 
@@ -222,7 +157,7 @@ def startall(name):
         Fatal("No Buildbots attached to server %s." % server.name)
 
     for bot in bots:
-        BotTasks.start(bot.name)
+        loki.bot.start(bot.name)
 
     Success('Complete')
 
@@ -243,6 +178,39 @@ def stopall(name):
         Fatal("No Buildbots attached to server %s." % server.name)
 
     for bot in bots:
-        BotTasks.stop(bot.name)
+        loki.bot.stop(bot.name)
 
     Success('Complete')
+
+
+def allocserver(type, profile, Session):
+    """
+    Allocate a server of the type.  Will return the server with the fewest
+    bots currently on it.
+
+    @param type: Type of bot being created
+    @type type: string
+
+    @param profile: a profile to apply to the server filter
+    @type profile: string
+    """
+    if profile == None:
+        servers = Session.query(Server).filter_by(type=unicode(type)).all()
+    else:
+        servers = Session.query(Server).filter_by(
+                      type=unicode(type), profile=unicode(profile)).all()
+
+    if len(servers) == 0:
+        return None
+    if len(servers)== 1:
+        return servers[0]
+    counts = {}
+    for server in servers:
+        counts[server] = 0
+
+    mincount = min(counts.values())
+    for server in servers:
+        if counts[server] == mincount:
+            return server
+
+    return None

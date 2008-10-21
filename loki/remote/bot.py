@@ -1,7 +1,7 @@
-# Copyright 2008, Red Hat, Inc
-# Steve 'Ashcrow' Milner <smilner@redhat.com>
-# Scott Henson <shenson@redhat.com>
+# Copyright 2009, Red Hat, Inc
 # Dan Radez <dradez@redhat.com>
+# Scott Henson <shenson@redhat.com>
+# Steve 'Ashcrow' Milner <smilner@redhat.com>
 #
 # This software may be freely redistributed under the terms of the GNU
 # general public license.
@@ -10,19 +10,49 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 """
-Remote tasks.
-These tasks take a buildbot model object
-and make the call to the build nodes to do the actual work.
+functions that handle remote connections over func
+and execute tasks remotely
 """
 
 import types
 import xmlrpclib
 from os import tmpfile
-from CommonTasks import getminion
-from CommonTasks import getbot
-from CommonTasks import getpath
-from loki.Log import Fatal
-from Common import *
+from loki.Common import *
+from loki.remote.server import getminion
+
+
+def getbot(bot):
+    """
+    Returns the client corresponding to the bot
+
+    @param bot: The bot you wish to get the client for
+    @type bot: SQLAlchemy Model
+
+    @return: A func client
+    @rtype: func.overlord.client.Client
+    """
+    server = bot.server.name
+    return getminion(server)
+
+
+def getpath(bot=None, server=None):
+    """
+    Returns the base path for the bot
+
+    @return: the base path
+    @rtype: string
+    """
+    if bot is not None and server is None:
+        return bot.server.basedir
+    elif bot is None and server is not None:
+        return server.basedir
+    elif bot is not None and server is not None:
+        if server == bot.server:
+            return server.basedir
+        else:
+            raise(Exception('Bot not found on Server, path is ambiguous'))
+    else:
+        raise(Exception('Must specify a bot or a server'))
 
 
 def restart(bot):
@@ -204,17 +234,16 @@ def __check_func(value):
     @param value: Return value of func call
     """
 
-    #print value
     if type(value) == types.ListType and \
        len(value) and \
        value[0] == 'REMOTE_ERROR':
-        Fatal('\n'.join(value))
+        raise(Exception(('\n'.join(value))))
     return value
 
 
 def config(bot, data):
     """
-    Push a config
+    Push a config   
 
     @param bot: The bot you wish to write config to
     @type bot: SQLAlchemy Model
@@ -227,8 +256,8 @@ def config(bot, data):
     #directory exists so push the config
     rbot = getbot(bot)
     rpath = getpath(bot=bot)
-    f = tmpfile()
-    f.write(data)
+    f = tmpfile()   
+    f.write(data)   
     f.seek(0)
     data = xmlrpclib.Binary(f.read())
     if bot.type == MASTER:

@@ -14,7 +14,6 @@ BuildDB Setup Tasks
 Used to initialize any resources that BuildDB uses
 """
 
-from loki.Log import *
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy import engine_from_config
 from loki.Common import *
