@@ -7,10 +7,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+"""
+TODO: Document me!
+"""
+
 import loki.store
+
 from director import Action
 from director.decorators import general_help
-
 
 
 class Store(Action):

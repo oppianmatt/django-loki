@@ -16,7 +16,9 @@ and execute tasks remotely
 
 import types
 import xmlrpclib
+
 from os import tmpfile
+
 from loki.Common import *
 from loki.remote.server import getminion
 
@@ -233,7 +235,6 @@ def __check_func(value):
 
     @param value: Return value of func call
     """
-
     if type(value) == types.ListType and \
        len(value) and \
        value[0] == 'REMOTE_ERROR':
@@ -243,7 +244,7 @@ def __check_func(value):
 
 def config(bot, data):
     """
-    Push a config   
+    Push a config
 
     @param bot: The bot you wish to write config to
     @type bot: SQLAlchemy Model
@@ -256,8 +257,8 @@ def config(bot, data):
     #directory exists so push the config
     rbot = getbot(bot)
     rpath = getpath(bot=bot)
-    f = tmpfile()   
-    f.write(data)   
+    f = tmpfile()
+    f.write(data)
     f.seek(0)
     data = xmlrpclib.Binary(f.read())
     if bot.type == MASTER:

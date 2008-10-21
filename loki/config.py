@@ -29,7 +29,6 @@ from loki.model import BuildParam
 from loki.Colors import Colors
 
 
-
 def list(type, master=None, path=None):
     """
     Lists Build Configs from a master

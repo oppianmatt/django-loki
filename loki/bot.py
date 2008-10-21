@@ -112,7 +112,8 @@ def createslave(name, master, profile):
 
     server.buildbots.append(bot)
 
-    master = Orm().session.query(BuildMaster).filter_by(name=unicode(master)).first()
+    master = Orm().session.query(BuildMaster).filter_by(
+                 name=unicode(master)).first()
     if master is None:
         Orm().session.rollback()
         Fatal('Master %s does not exist' % master)
@@ -130,6 +131,7 @@ def createslave(name, master, profile):
 
     Orm().session.commit()
     return True
+
 
 def delete(name):
     """
@@ -160,6 +162,7 @@ def delete(name):
 
     return True
 
+
 def get(type=BUILDBOT, name=None):
     """
     get bot objects
@@ -172,12 +175,12 @@ def get(type=BUILDBOT, name=None):
     """
 
     if type == BUILDBOT:
-        qry =  Orm().session.query(BuildBot)
+        qry = Orm().session.query(BuildBot)
     if type == MASTER:
-        qry =  Orm().session.query(BuildMaster)
+        qry = Orm().session.query(BuildMaster)
     if type == SLAVE:
-        qry =  Orm().session.query(BuildSlave)
-    
+        qry = Orm().session.query(BuildSlave)
+
     if name == None:
         return qry.all()
     else:
@@ -328,7 +331,8 @@ def reload(name):
     """
     bot = loki.bot.get(name=unicode(name))
     if bot.type != "master":
-        raise(Exception('Build Bot is not a master, Only masters can be reloaded'))
+        raise Exception('Build Bot is not a master,'
+                        'Only masters can be reloaded')
     try:
         loki.remote.bot.update(bot)
         loki.remote.bot.reload(bot)
@@ -413,6 +417,7 @@ def generate_config(name):
     #write the file to the bot over func
     return loki.remote.bot.config(bot, t)
 
+
 def allocport(type, override):
     """
     Allocate a port of passed type.
@@ -461,7 +466,10 @@ def _template(tpl, **vars):
 
 
 def _generate_class(cls):
-   gcls = cls.module.split('.')[-1]
-   gprm = ["%s=%s" % (param.name, param.value) for param in cls.params]
-   return "%s(%s)"% (gcls,\
-                     ', '.join(gprm))
+    """
+    TODO: Document me!
+    """
+    gcls = cls.module.split('.')[-1]
+    gprm = ["%s=%s" % (param.name, param.value) for param in cls.params]
+    return "%s(%s)"% (gcls,\
+                      ', '.join(gprm))

@@ -7,6 +7,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+"""
+TODO: Document me!
+"""
+
 from director import Action
 from director.decorators import general_help
 
@@ -49,7 +53,6 @@ class Bot(Action):
                    status)
             Log(msg[:-1])
 
-
     @general_help("Prints a bot's details.",
                   {'name': 'FQDN of a registered server'},
                   ['tloki server report [--name=example.com]'])
@@ -84,7 +87,7 @@ class Bot(Action):
                        bot.web_port,
                        bot.slave_passwd)
             if bot.server.type == SLAVE:
-                 slaves += "%s: %s\n\tServer: %s\n\tType: %s\
+                slaves += "%s: %s\n\tServer: %s\n\tType: %s\
                             \n\tMaster: %s\n\tProfile: %s\n" %\
                            (Colors().format_string(bot.name, "blue"),
                             status,
@@ -115,7 +118,6 @@ class Bot(Action):
             msg += '\n'
 
         Log(msg[:-1])
-
 
     @general_help("Creates a new bot",
                   {'name': 'bot name',
@@ -160,7 +162,7 @@ class Bot(Action):
         if type == MASTER:
             try:
                 loki.bot.createmaster(name, profile, webport,
-                                      slaveport, slavepasswd)  
+                                      slaveport, slavepasswd)
             except Exception, ex:
                 Fatal(ex)
             Success('Build Master %s Created.\n' % name)
@@ -173,7 +175,6 @@ class Bot(Action):
                 Success('Build Slave %s Created.\n' % name)
             else:
                 Fatal('invalid bot type, use --type=master or --type=slave')
-
 
     @general_help("Deletes a bot.",
                   {'name': 'name of a bot'},
@@ -190,7 +191,7 @@ class Bot(Action):
 
     @general_help("Starts a bot.",
                   {'name': 'name of a bot',
-                   'type':' master or slave, stops all of passed type'},
+                   'type': 'master or slave, stops all of passed type'},
                   ['loki bot start --name=slavebot',
                    'loki bot start --type=master'])
     def start(self, name=None, type=None):
@@ -279,7 +280,7 @@ class Bot(Action):
         @param name: the name of an existing bot
         @type name: str
         """
-        if loki.bot.generate_config(name)
+        if loki.bot.generate_config(name):
             Success('Config updated.')
         else:
             Success('Config unchanged.')

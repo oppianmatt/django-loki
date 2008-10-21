@@ -7,12 +7,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+"""
+TODO: Document me!
+"""
+
 import loki.server
 import loki.remote.server
-from director import Action
-from director.decorators import general_help
+
 from loki.Common import *
 from loki.Colors import Colors
+from director import Action
+from director.decorators import general_help
+
 
 class Server(Action):
     """
@@ -34,9 +40,10 @@ class Server(Action):
             status = Colors().format_string("off", "red")
             if loki.remote.server.status(server) == True:
                 status = Colors().format_string("on", "green")
-            msg += "%s (%s).... %s\n" % (Colors().format_string(server.name, 'blue'),
-                                         server.profile,
-                                         status)
+            msg += "%s (%s).... %s\n" % (
+                Colors().format_string(server.name, 'blue'),
+                server.profile,
+                status)
         Log(msg[:-1])
 
     @general_help('Prints server details',
@@ -79,7 +86,6 @@ class Server(Action):
             Fatal('No Servers Found')
 
         Log(msg[:-1])
-
 
     @general_help('Registers a new server',
                   {'name': 'FQDN of the server',

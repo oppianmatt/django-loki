@@ -17,9 +17,15 @@ from loki.store import createSession, getConfig
 
 
 class Orm(object):
+    """
+    TODO: Document me!
+    """
 
     session = None
 
     def __init__(self):
+        """
+        TODO: Document me!
+        """
         if self.session == None:
             self.session = createSession(getConfig())

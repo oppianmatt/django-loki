@@ -18,6 +18,9 @@ from optparse import Option, OptionValueError
 
 
 def check_unicode(option, opt, value):
+    """
+    TODO: Document me!
+    """
     try:
         return unicode(value)
     except ValueError:
@@ -26,6 +29,9 @@ def check_unicode(option, opt, value):
 
 
 class Unicode(Option):
+    """
+    TODO: Document me!
+    """
     TYPES = Option.TYPES + ("unicode", )
     TYPE_CHECKER = copy(Option.TYPE_CHECKER)
     TYPE_CHECKER["unicode"] = check_unicode
