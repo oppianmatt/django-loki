@@ -17,7 +17,6 @@ and execute tasks remotely
 import types
 import xmlrpclib
 from os import tmpfile
-from loki.Log import Fatal
 from loki.Common import *
 from loki.remote.server import getminion
 

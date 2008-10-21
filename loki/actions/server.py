@@ -49,7 +49,37 @@ class Server(Action):
         @param name: The FQDN of a registered server
         @type name: str
         """
-        loki.server.report(name)
+        if name != None:
+            servers = loki.server.get(name=unicode(name))
+        else:
+            servers = loki.server.get()
+
+        msg = '\n'
+        for server in servers:
+            status = color.format_string("off", "red")
+            m = loki.remote.server.getminion(server.name)
+            if m.test.ping() == 1:
+                status = color.format_string("on", "green")
+
+            bots = ''
+            for bot in server.buildbots:
+                bots += "\t%s\n" % bot.name
+
+            msg += "%s: %s\n\tBots Type: %s\n\tProfile: %s\
+                    \n\tBase Dir: %s\n\tComment: %s\n    %ss:\n%s\n" % \
+                  (color.format_string(server.name, 'blue'),
+                   status,
+                   server.type,
+                   server.profile,
+                   server.basedir,
+                   server.comment,
+                   server.type.capitalize(),
+                   bots)
+        if msg == '\n':
+            Fatal('No Servers Found')
+
+        Log(msg[:-1])
+
 
     @general_help('Registers a new server',
                   {'name': 'FQDN of the server',
@@ -82,6 +112,7 @@ class Server(Action):
         @type comment: str
         """
         loki.server.register(name, basedir, type, profile, comment)
+        Success('Server %s registered' % name)
 
     @general_help('Unregisters a new server',
                   {'name': 'the FQDN of a registered server',
@@ -96,6 +127,7 @@ class Server(Action):
         @type name: str
         """
         loki.server.unregister(name, delete_bots)
+        Success('Server %s unregistered' % name)
 
     @general_help('Starts all bots on a server',
                   {'name': 'the FQDN of a registered server'},

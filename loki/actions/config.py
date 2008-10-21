@@ -10,9 +10,7 @@
 import loki.config
 from director import Action
 from director.decorators import general_help
-
 from loki.Common import *
-from loki.Log import *
 
 
 class Config(Action):

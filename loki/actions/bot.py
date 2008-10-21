@@ -279,4 +279,7 @@ class Bot(Action):
         @param name: the name of an existing bot
         @type name: str
         """
-        loki.bot.generate_config(name)
+        if loki.bot.generate_config(name)
+            Success('Config updated.')
+        else:
+            Success('Config unchanged.')

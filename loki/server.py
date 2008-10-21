@@ -24,11 +24,7 @@ from sqlalchemy.sql import func
 from loki import Orm
 from loki.model import Server, BuildBot, BuildMaster, BuildSlave
 from loki.Colors import Colors
-from loki.Log import *
 from loki.Common import *
-
-color = Colors()
-Session = Orm().session
 
 
 def register(name, basedir, type, profile, comment=''):
@@ -51,27 +47,27 @@ def register(name, basedir, type, profile, comment=''):
     @type comment: str
     """
 
-    server = Session.query(Server).filter_by(name=unicode(name)).first()
+    server = get(name=unicode(name))
     if server != None:
-        Fatal('Server %s already exists' % name)
+        raise(Exception('Server %s already exists' % name))
 
     server = Server(name, profile, basedir, type, comment)
 
-    Session.save(server)
+    Orm().session.save(server)
     m = loki.remote.server.getminion(server.name)
 
     try:
         if m.test.ping() != 1:
             raise(Exception('No response from server/func.'))
     except Exception, ex:
-        Session.rollback()
-        Session.remove()
-        Fatal('Server %s Registration Failed.\n%s' % \
+        Orm().session.rollback()
+        Orm().session.remove()
+        raise(Exception('Server %s Registration Failed.\n%s' % \
              (server.name, '$ func %s ping failed\nError: %s' % \
-             (server.name, ex)))
+             (server.name, ex))))
 
-    Session.commit()
-    Success('Server %s registered.' % server.name)
+    Orm().session.commit()
+    return True
 
 
 def unregister(name, delete_bots=False):
@@ -81,12 +77,12 @@ def unregister(name, delete_bots=False):
     @param name: the FQDN of a registered server
     @type name: str
     """
-    server = Session.query(Server).filter_by(name=unicode(name)).first()
+    server = get(name=unicode(name))
 
     if server is None:
-        Fatal('Server %s does not exist.' % name)
+        raise(Exception('Server %s does not exist.' % name))
 
-    masters = Session.query(BuildMaster).filter_by(
+    masters = Orm().session.query(BuildMaster).filter_by(
                   server_id=unicode(server.id)).all()
     if masters != []:
         if delete_bots:
@@ -103,10 +99,10 @@ def unregister(name, delete_bots=False):
         else:
             raise(Exception("Slave Bots exists, use --delete-bots to force"))
 
-    Session.delete(server)
-    Session.commit()
+    Orm().session.delete(server)
+    Orm().session.commit()
 
-    Success('Server %s unregistered.' % name)
+    return True
 
 
 def get(name=None):
@@ -122,47 +118,6 @@ def get(name=None):
         servers = Session.query(Server).all()
 
     return servers
-
-
-def report(name=None):
-    """
-    Reports server Details
-
-    @param name: the FQDN of a registered server
-    @type name: str
-    """
-    if name != None:
-        servers = []
-        servers.extend(loki.server.get(name=unicode(name)))
-    else:
-        servers = loki.server.get()
-
-    msg = '\n'
-    for server in servers:
-        status = color.format_string("off", "red")
-        m = loki.remote.server.getminion(server.name)
-        if m.test.ping() == 1:
-            status = color.format_string("on", "green")
-
-        bots = ''
-        for bot in server.buildbots:
-            bots += "\t%s\n" % bot.name
-
-        msg += "%s: %s\n\tBots Type: %s\n\tProfile: %s\
-                \n\tBase Dir: %s\n\tComment: %s\n    %ss:\n%s\n" % \
-              (color.format_string(server.name, 'blue'),
-               status,
-               server.type,
-               server.profile,
-               server.basedir,
-               server.comment,
-               server.type.capitalize(),
-               bots)
-    if msg == '\n':
-        Fatal('No Servers Found')
-
-    Log(msg[:-1])
-    return True
 
 
 def restartall(name):
