@@ -1,4 +1,5 @@
 # Copyright 2008, Red Hat, Inc
+# Dan Radez <dradez@redhat.com>
 # Steve 'Ashcrow' Milner <smilner@redhat.com>
 #
 # This software may be freely redistributed under the terms of the GNU

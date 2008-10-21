@@ -1,3 +1,12 @@
+# Copyright 2008, Red Hat, Inc
+# Dan Radez <dradez@redhat.com>
+#
+# This software may be freely redistributed under the terms of the GNU
+# general public license.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 from director import Action
 from director.decorators import general_help
 
@@ -149,13 +158,22 @@ class Bot(Action):
         @type slavepasswd: str
         """
         if type == MASTER:
-            BotTasks.createmaster(name, profile, webport,
-                                  slaveport, slavepasswd)
+            try:
+                loki.bot.createmaster(name, profile, webport,
+                                      slaveport, slavepasswd)  
+            except Exception, ex:
+                Fatal(ex)
+            Success('Build Master %s Created.\n' % name)
         else:
             if type == SLAVE:
-                BotTasks.createslave(name, master, profile)
+                try:
+                    loki.bot.createslave(name, master, profile)
+                except Exception, ex:
+                    Fatal(ex)
+                Success('Build Slave %s Created.\n' % name)
             else:
                 Fatal('invalid bot type, use --type=master or --type=slave')
+
 
     @general_help("Deletes a bot.",
                   {'name': 'name of a bot'},
@@ -167,7 +185,8 @@ class Bot(Action):
         @param name: the name of an existing bot
         @type name: str
         """
-        BotTasks.delete(name)
+        loki.bot.delete(name)
+        Success('BuildBot %s Deleted.' % name)
 
     @general_help("Starts a bot.",
                   {'name': 'name of a bot',
@@ -184,9 +203,9 @@ class Bot(Action):
         if name == None and type == None:
             Fatal("You must pass --name or --type")
         if name != None:
-            BotTasks.start(name)
+            loki.bot.start(name)
         if type != None:
-            BotTasks.startall(type=type)
+            loki.bot.startall(type=type)
 
     @general_help("Starts a bot.",
                   {'name': 'a the name of a bot',
@@ -203,9 +222,9 @@ class Bot(Action):
         if name == None and type == None:
             Fatal("You must pass --name or --type")
         if name != None:
-            BotTasks.restart(name)
+            loki.bot.restart(name)
         if type != None:
-            BotTasks.restartall(type=type)
+            loki.bot.restartall(type=type)
 
     @general_help("Stops a bot.",
                   {'name': 'a the name of a bot',
@@ -222,9 +241,9 @@ class Bot(Action):
         if name == None and type == None:
             Fatal("You must pass --name or --type")
         if name != None:
-            BotTasks.stop(name)
+            loki.bot.stop(name)
         if type != None:
-            BotTasks.stopall(type=type)
+            loki.bot.stopall(type=type)
 
     @general_help("Update a bot.",
                   {'name': 'a the name of a bot'},
@@ -236,7 +255,7 @@ class Bot(Action):
         @param name: the name of an existing bot
         @type name: str
         """
-        BotTasks.update(name)
+        loki.bot.update(name)
 
     @general_help("Update and reload a bot.",
                   {'name': 'a the name of a bot'},
@@ -248,7 +267,7 @@ class Bot(Action):
         @param name: the name of an existing bot
         @type name: str
         """
-        BotTasks.reload(name)
+        loki.bot.reload(name)
 
     @general_help("Generate a bots config.",
                   {'name': 'name of a bot'},
@@ -260,4 +279,4 @@ class Bot(Action):
         @param name: the name of an existing bot
         @type name: str
         """
-        BotTasks.generate_config(name)
+        loki.bot.generate_config(name)

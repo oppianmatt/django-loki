@@ -94,7 +94,7 @@ class Server(object):
     Server class
     """
 
-    def __init__(self, name, profile, basedir, type, comment = ''):
+    def __init__(self, name, profile, basedir, type, comment = u''):
         """
         Server
 
@@ -161,7 +161,7 @@ class BuildMaster(BuildBot):
     BuildMaster class
     """
 
-    def __init__(self, name, comment = '', config_source=''):
+    def __init__(self, name, comment = u'', config_source=u''):
         """
         BuildBot class
 

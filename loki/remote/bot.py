@@ -235,11 +235,10 @@ def __check_func(value):
     @param value: Return value of func call
     """
 
-    #print value
     if type(value) == types.ListType and \
        len(value) and \
        value[0] == 'REMOTE_ERROR':
-        Fatal('\n'.join(value))
+        raise(Exception(('\n'.join(value))))
     return value
 
 

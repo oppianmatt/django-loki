@@ -1,3 +1,12 @@
+# Copyright 2008, Red Hat, Inc
+# Dan Radez <dradez@redhat.com>
+#
+# This software may be freely redistributed under the terms of the GNU
+# general public license.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 import loki.server
 import loki.remote.server
 from director import Action
@@ -40,7 +49,7 @@ class Server(Action):
         @param name: The FQDN of a registered server
         @type name: str
         """
-        ServerTasks.report(name)
+        loki.server.report(name)
 
     @general_help('Registers a new server',
                   {'name': 'FQDN of the server',
@@ -72,7 +81,7 @@ class Server(Action):
         @param comment: an optional comment
         @type comment: str
         """
-        ServerTasks.register(name, basedir, type, profile, comment)
+        loki.server.register(name, basedir, type, profile, comment)
 
     @general_help('Unregisters a new server',
                   {'name': 'the FQDN of a registered server',
@@ -86,7 +95,7 @@ class Server(Action):
         @param name: the FQDN of a registered server
         @type name: str
         """
-        ServerTasks.unregister(name, delete_bots)
+        loki.server.unregister(name, delete_bots)
 
     @general_help('Starts all bots on a server',
                   {'name': 'the FQDN of a registered server'},
@@ -98,7 +107,7 @@ class Server(Action):
         @param name: the FQDN of a registered server
         @type name: str
         """
-        ServerTasks.startall(name)
+        loki.server.startall(name)
 
     @general_help('Restarts all bots on a server',
                   {'name': 'the FQDN of a registered server'},
@@ -110,7 +119,7 @@ class Server(Action):
         @param name: the FQDN of a registered server
         @type name: str
         """
-        ServerTasks.restart(name)
+        loki.server.restart(name)
 
     @general_help('Stops all bots on a server',
                   {'name': 'the FQDN of a registered server'},
@@ -122,7 +131,7 @@ class Server(Action):
         @param name: the FQDN of a registered server
         @type name: str
         """
-        ServerTasks.stopall(name)
+        loki.server.stopall(name)
 
     @general_help('Generates an html file listing masters',
                   examples=['loki server genhome'])
@@ -131,4 +140,4 @@ class Server(Action):
         Generates an html file listing masters
         and giving links to their ports
         """
-        ConfigTasks.generate_home_page()
+        loki.config.generate_home_page()

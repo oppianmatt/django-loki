@@ -1,7 +1,7 @@
 # Copyright 2008, Red Hat, Inc
+# Dan Radez <dradez@redhat.com>
 # Steve 'Ashcrow' Milner <smilner@redhat.com>
 # Scott Henson <shenson@redhat.com>
-# Dan Radez <dradez@redhat.com>
 #
 # This software may be freely redistributed under the terms of the GNU
 # general public license.
@@ -10,8 +10,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 """
-Server Tasks - These are the actual things that will wrap together everything
-else and actually get something done with servers.
+Server API - work with servers
 """
 
 import os
@@ -59,7 +58,7 @@ def register(name, basedir, type, profile, comment=''):
     server = Server(name, profile, basedir, type, comment)
 
     Session.save(server)
-    m = loki.CommonTasks.getminion(server.name)
+    m = loki.remote.server.getminion(server.name)
 
     try:
         if m.test.ping() != 1:
@@ -92,7 +91,7 @@ def unregister(name, delete_bots=False):
     if masters != []:
         if delete_bots:
             for master in masters:
-                loki.BotTasks.delete(master.name)
+                loki.loki.bot.delete(master.name)
         else:
             raise(Exception("Master Bots exist, use --delete-bots to force"))
     slaves = Session.query(BuildSlave).filter_by(
@@ -100,7 +99,7 @@ def unregister(name, delete_bots=False):
     if slaves != None:
         if delete_bots:
             for slave in slaves:
-                loki.BotTasks.delete(slave.name)
+                loki.loki.bot.delete(slave.name)
         else:
             raise(Exception("Slave Bots exists, use --delete-bots to force"))
 
@@ -133,14 +132,15 @@ def report(name=None):
     @type name: str
     """
     if name != None:
-        servers = Session.query(Server).filter_by(name=unicode(name)).all()
+        servers = []
+        servers.extend(loki.server.get(name=unicode(name)))
     else:
-        servers = loki.ModelTasks.listitems(SERVER, Session)
+        servers = loki.server.get()
 
     msg = '\n'
     for server in servers:
         status = color.format_string("off", "red")
-        m = loki.CommonTasks.getminion(server.name)
+        m = loki.remote.server.getminion(server.name)
         if m.test.ping() == 1:
             status = color.format_string("on", "green")
 
@@ -181,7 +181,7 @@ def restartall(name):
         Fatal("No Buildbots attached to server %s." % server.name)
 
     for bot in bots:
-        BotTasks.restart(bot.name)
+        loki.bot.restart(bot.name)
 
     Success('Complete')
 
@@ -202,7 +202,7 @@ def startall(name):
         Fatal("No Buildbots attached to server %s." % server.name)
 
     for bot in bots:
-        BotTasks.start(bot.name)
+        loki.bot.start(bot.name)
 
     Success('Complete')
 
@@ -223,7 +223,7 @@ def stopall(name):
         Fatal("No Buildbots attached to server %s." % server.name)
 
     for bot in bots:
-        BotTasks.stop(bot.name)
+        loki.bot.stop(bot.name)
 
     Success('Complete')
 
@@ -259,43 +259,3 @@ def allocserver(type, profile, Session):
             return server
 
     return None
-
-
-def allocport(type, override, Session):
-    """
-    Allocate a port of passed type.
-
-    @param type: type of port (web or slave)
-    @type type: str
-
-    @param override: user defined to override allocation
-    @type: str
-    """
-    if override != None:
-        return override
-
-    if type == WEB:
-        web_port = Session.execute(select([func.max(
-                       masters.c.web_port)])).scalar()
-        if web_port == None:
-            return '2000'
-        return web_port+1
-    if type == SLAVE:
-        slave_port = Session.execute(select(
-                         [func.max(masters.c.slave_port)])).scalar()
-        if slave_port== None:
-            return '9000'
-        return slave_port+1
-
-
-def genpasswd(override, length=8, chars=string.letters + string.digits):
-    """
-    Generate a password
-
-    @param override: user defined to override generation
-    @type: str
-    """
-    if override != None:
-        return override
-    #next line stolen from http://code.activestate.com/recipes/59873/
-    return ''.join([choice(chars) for i in range(length)])

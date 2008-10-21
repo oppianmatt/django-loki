@@ -10,16 +10,20 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 """
-BotTasks - These are the actual things that will wrap together everything
-else and actually get something done.
+Bot API - work with the buildbots
 """
 
 import os
 import time
+import string
+import loki.server
 
+from random import choice
+from sqlalchemy.sql import select
+from sqlalchemy.sql import func
 from loki.Common import *
 from loki import Orm
-from loki.model import Server, BuildBot, BuildMaster, BuildSlave
+from loki.model import Server, BuildBot, BuildMaster, BuildSlave, masters
 from loki.Log import *
 from loki.Colors import Colors
 
@@ -49,7 +53,7 @@ def createmaster(name, profile=None, webport=None,
     # Check if master already Exists
     if Session.query(BuildMaster).filter_by(
                      name=unicode(name)).first() is not None:
-        Fatal('Master %s already exists.\n' % name)
+        raise(Exception('Master %s already exists.\n' % name))
 
     bot = BuildMaster(unicode(name))
     bot.slave_port = allocport(SLAVE, slaveport, Session)
@@ -59,27 +63,25 @@ def createmaster(name, profile=None, webport=None,
 
     # SQLAlchemy Session... marking where to Rollback to
     # Attempt to Allocate Server and roll back if failure
-    server = allocserver(MASTER, profile, Session)
+    server = loki.server.allocserver(MASTER, profile, Session)
     if server is None:
         Session.rollback()
         Session.remove()
-        Fatal('No servers available.')
+        rasie(Exception('No servers available.'))
 
     server.buildbots.append(bot)
 
     Session.save(bot)
     try:
-        RemoteTasks.create_master(bot)
-        if not RemoteTasks.exists(bot):
+        loki.remote.bot.create_master(bot)
+        if not loki.remote.bot.exists(bot):
             raise(Exception('Remote creation tasks failed'))
     except Exception, ex:
         Session.rollback()
         Session.remove()
-        Fatal('Failed to create Master %s.\n%s' % (name, ex))
+        rasie(Exception('Failed to create Master %s.\n%s' % (name, ex)))
 
     Session.commit()
-    Success('Build Master %s Created.' % bot.name)
-
     return True
 
 
@@ -106,7 +108,7 @@ def createslave(name, master, profile):
 
     bot = BuildSlave(unicode(name))
 
-    server = allocserver(SLAVE, profile, Session)
+    server = loki.server.allocserver(SLAVE, profile, Session)
     if server is None:
         Session.rollback()
         Fatal('No servers available.\n')
@@ -122,16 +124,15 @@ def createslave(name, master, profile):
 
     #Session.save(bot)
     try:
-        RemoteTasks.create_slave(bot)
-        if not RemoteTasks.exists(bot):
+        loki.remote.bot.create_slave(bot)
+        if not loki.remote.bot.exists(bot):
             raise(Exception('Remote creation tasks failed'))
     except Exception, ex:
         Session.rollback()
-        Fatal('Failed to create Slave %s.\n %s' % (name, ex))
+        raise(Exception('Failed to create Slave %s.\n %s' % (name, ex)))
 
     Session.commit()
-    Success('Build Slave %s Created.\n' % name)
-
+    return True
 
 def delete(name):
     """
@@ -141,26 +142,26 @@ def delete(name):
     @type name: str
     """
 
-    bot = Session.query(BuildBot).filter_by(name=unicode(name)).first()
+    bot = get(name=unicode(name))
 
     if bot is None:
-        Fatal('BuildBot %s does not exist.' % name)
+        rasie(Exception('BuildBot %s does not exist.' % name))
 
     try:
-        RemoteTasks.delete(bot)
-        if RemoteTasks.exists(bot):
-            Fatal('Remote deletion Failed')
+        if loki.remote.bot.exists(bot):
+            loki.remote.bot.delete(bot)
+        if loki.remote.bot.exists(bot):
+            raise(Exception('Remote deletion Failed'))
     except Exception, ex:
         Session.rollback()
         Session.remove()
-        Fatal('Failed to delete BuildBot %s.\n %s' % (name, ex))
+        raise(Exception('Failed to delete BuildBot %s.\n %s' % (name, ex)))
 
     Session.delete(bot)
     #Session.save(bot)
     Session.commit()
 
-    Success('BuildBot %s Deleted.' % name)
-
+    return True
 
 def get(type=BUILDBOT, name=None):
     """
@@ -208,7 +209,7 @@ def restart(name, action="Restart"):
     """
     bot = Session.query(BuildBot).filter_by(name=unicode(name)).first()
     try:
-        RemoteTasks.restart(bot)
+        loki.remote.bot.restart(bot)
     except Exception, ex:
         Fatal('%s Failed: %s' % (action, ex))
     Success('%s Complete' % action)
@@ -228,8 +229,8 @@ def startall(type):
     for bot in bots:
         ret = False
         try:
-            if not RemoteTasks.status(bot):
-                ret = RemoteTasks.restart(bot)
+            if not loki.remote.bot.status(bot):
+                ret = loki.remote.bot.restart(bot)
         except Exception, ex:
             Error('%s %s failed to Start: \n %s' % (
                                    type.capitalize(),
@@ -254,8 +255,8 @@ def restartall(type):
     for bot in bots:
         ret = False
         try:
-            if RemoteTasks.status(bot):
-                ret = RemoteTasks.restart(bot)
+            if loki.remote.bot.status(bot):
+                ret = loki.remote.bot.restart(bot)
         except Exception, ex:
             Error('%s %s failed to restart: \n %s' % (type.capitalize(),
                                                       bot.name, ex))
@@ -274,7 +275,7 @@ def stop(name):
     """
     bot = Session.query(BuildBot).filter_by(name=unicode(name)).first()
     try:
-        RemoteTasks.stop(bot)
+        loki.remote.bot.stop(bot)
     except Exception, ex:
         Fatal('Stop Failed: %s' % ex)
     Success('Stop Complete')
@@ -294,7 +295,7 @@ def stopall(type):
     for bot in bots:
         ret = False
         try:
-            ret = RemoteTasks.stop(bot)
+            ret = loki.remote.bot.stop(bot)
         except Exception, ex:
             Error('%s %s failed to stop: \n %s' % (type.capitalize(),
                                                    bot.name, ex))
@@ -315,7 +316,7 @@ def update(name):
     if bot.type != MASTER:
         Fatal('Build Bot is not a master. Only masters can be updated.')
     try:
-        RemoteTasks.update(bot)
+        loki.remote.bot.update(bot)
     except Exception, ex:
         Fatal('Update Failed: %s' % ex)
     Success('Update Complete')
@@ -332,8 +333,8 @@ def reload(name):
     if bot.type != "master":
         Fatal('Build Bot is not a master, Only masters can be reloaded')
     try:
-        RemoteTasks.update(bot)
-        RemoteTasks.reload(bot)
+        loki.remote.bot.update(bot)
+        loki.remote.bot.reload(bot)
     except Exception, ex:
         Fatal('Reload Failed: %s' % ex)
     Success('Reload Complete')
@@ -413,10 +414,49 @@ def generate_config(name):
                    slavepasswd=bot.master.slave_passwd)
 
     #write the file to the bot over func
-    if not RemoteTasks.config(bot, t):
+    if not loki.remote.bot.config(bot, t):
         Success('config unchanged.')
     else:
         Success('Config updated.')
+
+def allocport(type, override, Session):
+    """
+    Allocate a port of passed type.
+
+    @param type: type of port (web or slave)
+    @type type: str
+
+    @param override: user defined to override allocation
+    @type: str
+    """
+    if override != None:
+        return override
+
+    if type == WEB:
+        web_port = Session.execute(select([func.max(
+        masters.c.web_port)])).scalar()
+        if web_port == None:
+            return '2000'
+            return web_port+1
+    if type == SLAVE:
+        slave_port = Session.execute(select(
+        [func.max(masters.c.slave_port)])).scalar()
+        if slave_port== None:
+            return '9000'
+            return slave_port+1
+
+
+def genpasswd(override, length=8, chars=string.letters + string.digits):
+    """
+    Generate a password
+
+    @param override: user defined to override generation
+    @type: str
+    """
+    if override != None:
+        return override
+    #next line stolen from http://code.activestate.com/recipes/59873/
+    return ''.join([choice(chars) for i in range(length)])
 
 
 def _template(tpl, **vars):
