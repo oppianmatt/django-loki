@@ -138,38 +138,6 @@ class Server(Action):
     @general_help('Starts all bots on a server',
                   {'name': 'the FQDN of a registered server'},
                   ['loki server start --name=server.example.com'])
-    def start(self, name):
-        """
-        Starts all bots on a server
-
-        @param name: the FQDN of a registered server
-        @type name: str
-        """
-        loki.server.startall(name)
-
-    @general_help('Restarts all bots on a server',
-                  {'name': 'the FQDN of a registered server'},
-                  ['loki server unreg --name=server.example.com'])
-    def restart(self, name):
-        """
-        Restarts all bots on a server
-
-        @param name: the FQDN of a registered server
-        @type name: str
-        """
-        loki.server.restart(name)
-
-    @general_help('Stops all bots on a server',
-                  {'name': 'the FQDN of a registered server'},
-                  ['loki server unreg --name=server.example.com'])
-    def stop(self, name):
-        """
-        Stops all bots on a server
-
-        @param name: the FQDN of a registered server
-        @type name: str
-        """
-        loki.server.stopall(name)
 
     @general_help('Generates an html file listing masters',
                   examples=['loki server genhome'])
