@@ -113,7 +113,8 @@ def get(name=None):
     @type name: str
     """
     if name != None:
-        servers = Orm().session.query(Server).filter_by(name=unicode(name)).all()
+        servers = Orm().session.query(
+            Server).filter_by(name=unicode(name)).all()
     else:
         servers = Orm().session.query(Server).all()
 
@@ -127,7 +128,8 @@ def restartall(name):
     @param name: FQDN of server to restart bots on.
     @type name: str
     """
-    server = Orm().session.query(Server).filterby_by(name=unicode(name)).first()
+    server = Orm().session.query(
+        Server).filterby_by(name=unicode(name)).first()
     if server is None:
         Fatal("No registered servers found.")
 
@@ -195,7 +197,8 @@ def allocserver(type, profile):
     @type profile: string
     """
     if profile == None:
-        servers = Orm().session.query(Server).filter_by(type=unicode(type)).all()
+        servers = Orm().session.query(
+            Server).filter_by(type=unicode(type)).all()
     else:
         servers = Orm().session.query(Server).filter_by(
                       type=unicode(type), profile=unicode(profile)).all()
