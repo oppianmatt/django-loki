@@ -28,6 +28,9 @@ def json_encode(data):
     """
 
     def _any(data):
+        """
+        TODO: Document me!
+        """
         ret = None
         if type(data) is types.ListType:
             ret = _list(data)
@@ -46,6 +49,9 @@ def json_encode(data):
         return ret
 
     def _model(data):
+        """
+        TODO: Document me!
+        """
         ret = {}
         # If we only have a model, we only want to encode the fields.
         for f in data._meta.fields:
@@ -58,12 +64,18 @@ def json_encode(data):
         return ret
 
     def _list(data):
+        """
+        TODO: Document me!
+        """
         ret = []
         for v in data:
             ret.append(_any(v))
         return ret
 
     def _dict(data):
+        """
+        TODO: Document me!
+        """
         ret = {}
         for k, v in data.items():
             ret[k] = _any(v)

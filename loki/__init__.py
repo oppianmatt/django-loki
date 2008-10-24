@@ -15,7 +15,11 @@ __LICENSE__ = 'GPLv3'
 
 from loki.store import createSession, getConfig
 
-class Orm:
+class Orm(object):
+    """
+    TODO: Document me!
+    """
+
     __shared_state = {'session': None}
     def __init__(self):
         self.__dict__ = self.__shared_state

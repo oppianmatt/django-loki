@@ -60,7 +60,6 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'loki.web.urls'
 
-
 import os
 
 TEMPLATE_DIRS = (

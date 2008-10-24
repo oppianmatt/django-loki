@@ -25,6 +25,8 @@ def createEngine(cp, echo=False):
     """Call me at the beginning of the application.
        'bind' is a SQLAlchemy engine or connection, as returned by
        sa.create_engine, sa.engine_from_config, or engine.connect().
+
+    FIXME: Functions should not be mixed case.
     """
     config = {}
     for key in cp.options('app:main'):
@@ -36,6 +38,8 @@ def createEngine(cp, echo=False):
 def createSession(cp, engine=None):
     """
     Initialize the ORM Session
+
+    FIXME: Functions should not be mixed case.
 
     @param cp: Config Parser containing configs for SA
     @type cp: ConfgiParser
@@ -52,7 +56,7 @@ def createSession(cp, engine=None):
 def getConfig(config=CONFIGFILE):
     """
     Get the config parser object
-
+    FIXME: Functions should not be mixed case.
     """
     # Set up the config parser
     cp = ConfigParser.ConfigParser()
@@ -62,6 +66,10 @@ def getConfig(config=CONFIGFILE):
 
 
 def validateModel(Session, show_warn=True):
+    """
+    TODO: Document me!
+    FIXME: Functions should not be mixed case.
+    """
     try:
         check_db = Session.query(Config).filter_by(name=u'dbversion').first()
     except:
@@ -79,6 +87,10 @@ def validateModel(Session, show_warn=True):
 
 
 def createSchema():
+    """
+    TODO: Document me!
+    FIXME: Functions should not be mixed case.
+    """
     # Set up the config parser
     cp = ConfigParser.ConfigParser()
     setattr(cp, 'file_name', CONFIGFILE)
@@ -103,6 +115,10 @@ def createSchema():
 
 
 def updateSchema():
+    """
+    TODO: Document me!
+    FIXME: Functions should not be mixed case.
+    """
     # Set up the config parser
     cp = ConfigParser.ConfigParser()
     setattr(cp, 'file_name', CONFIGFILE)
