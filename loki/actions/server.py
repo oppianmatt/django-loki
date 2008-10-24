@@ -18,7 +18,7 @@ class Server(Action):
     """
     loki server actions
     """
-
+    
     description_txt = "Manages Servers"
 
     @general_help('Lists all servers', examples=['loki server list'])

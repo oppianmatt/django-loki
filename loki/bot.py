@@ -172,7 +172,7 @@ def get(type=BUILDBOT, name=None):
     """
 
     if type == BUILDBOT:
-        qry =  Orm().session.query(BuildBot)
+        qry = Orm().session.query(BuildBot)
     if type == MASTER:
         qry =  Orm().session.query(BuildMaster)
     if type == SLAVE:

@@ -15,6 +15,7 @@ import loki.remote.bot
 import loki.config
 from loki.Colors import Colors
 from loki.Common import *
+from loki import Orm
 
 
 class Bot(Action):
@@ -279,7 +280,7 @@ class Bot(Action):
         @param name: the name of an existing bot
         @type name: str
         """
-        if loki.bot.generate_config(name)
+        if loki.bot.generate_config(name):
             Success('Config updated.')
         else:
             Success('Config unchanged.')

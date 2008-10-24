@@ -90,7 +90,7 @@ def unregister(name, delete_bots=False):
                 loki.loki.bot.delete(master.name)
         else:
             raise(Exception("Master Bots exist, use --delete-bots to force"))
-    slaves = Session.query(BuildSlave).filter_by(
+    slaves = Orm().session.query(BuildSlave).filter_by(
                  server_id=unicode(server.id)).all()
     if slaves != None:
         if delete_bots:
@@ -113,9 +113,9 @@ def get(name=None):
     @type name: str
     """
     if name != None:
-        servers = Session.query(Server).filter_by(name=unicode(name)).all()
+        servers = Orm().session.query(Server).filter_by(name=unicode(name)).all()
     else:
-        servers = Session.query(Server).all()
+        servers = Orm().session.query(Server).all()
 
     return servers
 
@@ -127,7 +127,7 @@ def restartall(name):
     @param name: FQDN of server to restart bots on.
     @type name: str
     """
-    server = Session.query(Server).filterby_by(name=unicode(name)).first()
+    server = Orm().session.query(Server).filterby_by(name=unicode(name)).first()
     if server is None:
         Fatal("No registered servers found.")
 
@@ -148,7 +148,7 @@ def startall(name):
     @param name: FQDN of server to start bots on.
     @type name: str
     """
-    server = Session.query(Server).get_by(name=unicode(name))
+    server = Orm().session.query(Server).get_by(name=unicode(name))
     if server is None:
         Fatal("No registered server found.")
 
@@ -169,7 +169,7 @@ def stopall(name):
     @param name: FQDN of server to stop bots on.
     @type name: str
     """
-    server = Session.query(Server).get_by(name=unicode(name))
+    server = Orm().session.query(Server).get_by(name=unicode(name))
     if server is None:
         Fatal("No registered server found.")
 
@@ -183,7 +183,7 @@ def stopall(name):
     Success('Complete')
 
 
-def allocserver(type, profile, Session):
+def allocserver(type, profile):
     """
     Allocate a server of the type.  Will return the server with the fewest
     bots currently on it.
@@ -195,9 +195,9 @@ def allocserver(type, profile, Session):
     @type profile: string
     """
     if profile == None:
-        servers = Session.query(Server).filter_by(type=unicode(type)).all()
+        servers = Orm().session.query(Server).filter_by(type=unicode(type)).all()
     else:
-        servers = Session.query(Server).filter_by(
+        servers = Orm().session.query(Server).filter_by(
                       type=unicode(type), profile=unicode(profile)).all()
 
     if len(servers) == 0:
