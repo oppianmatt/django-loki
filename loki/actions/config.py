@@ -26,7 +26,8 @@ class Config(Action):
     description_txt = "Manages BuildBot Build Configs"
 
     @general_help("Lists master's steps.",
-                  {'master': 'master name'},
+                  {'master': 'master name',
+                   'path': 'python path to buildbot steps'},
                   ['loki config list --type=step'])
     def list(self, type, master=None, path=None):
         """

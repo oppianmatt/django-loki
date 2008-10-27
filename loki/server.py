@@ -16,6 +16,7 @@ Server API - work with servers
 import os
 import time
 import string
+import loki.remote.server
 
 from random import choice
 from sqlalchemy.sql import select
@@ -27,7 +28,7 @@ from loki.Colors import Colors
 from loki.Common import *
 
 
-def register(name, basedir, type, profile, comment=''):
+def register(name, basedir, type, profile, comment=u''):
     """
     Registers a server
 
@@ -51,7 +52,11 @@ def register(name, basedir, type, profile, comment=''):
     if server != None:
         raise(Exception('Server %s already exists' % name))
 
-    server = Server(name, profile, basedir, type, comment)
+    server = Server(unicode(name),
+                    unicode(profile),
+                    unicode(basedir),
+                    unicode(type),
+                    unicode(comment))
 
     Orm().session.save(server)
     m = loki.remote.server.getminion(server.name)
@@ -92,7 +97,7 @@ def unregister(name, delete_bots=False):
             raise(Exception("Master Bots exist, use --delete-bots to force"))
     slaves = Orm().session.query(BuildSlave).filter_by(
                  server_id=unicode(server.id)).all()
-    if slaves != None:
+    if len(slaves) > 0:
         if delete_bots:
             for slave in slaves:
                 loki.loki.bot.delete(slave.name)
@@ -114,7 +119,7 @@ def get(name=None):
     """
     if name != None:
         servers = Orm().session.query(
-            Server).filter_by(name=unicode(name)).all()
+            Server).filter_by(name=unicode(name)).first()
     else:
         servers = Orm().session.query(Server).all()
 

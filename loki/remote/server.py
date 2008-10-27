@@ -12,7 +12,9 @@ functions that handle remote connections over func
 and execute tasks remotely
 """
 
+import types
 import func.overlord.client as fc
+from loki.remote import check_func
 
 
 def getminion(host):
@@ -40,3 +42,24 @@ def status(server):
     """
     m = getminion(server.name)
     return m.test.ping()
+
+
+def getclasses(server, path):
+    """
+    Gets a master server's classes from a path
+
+    @param bot: The server you want to get steps from
+    @type bot: SQLAlchemy Model
+    """
+    m = getminion(server.name)
+    if path == None:
+        clses = m.loki_buildbot.showclasses()
+    else:
+        clses = m.loki_buildbot.showclasses(path)
+    #clean up LokiNone strings to be type None
+    if type(clses) == types.DictType:
+        for cls in clses:
+            for param in clses[cls][2]:
+                if clses[cls][2][param] == 'LokiNone':
+                    clses[cls][2][param] = None
+    return check_func(clses)

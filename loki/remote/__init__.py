@@ -11,3 +11,18 @@
 """
 TODO: Document me!
 """
+
+import types
+
+
+def check_func(value):
+    """
+    Check the return value of func and throw any exceptions that are found
+
+    @param value: Return value of func call
+    """
+    if type(value) == types.ListType and \
+       len(value) and \
+       value[0] == 'REMOTE_ERROR':
+        raise(Exception(('\n'.join(value))))
+    return value

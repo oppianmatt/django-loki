@@ -53,14 +53,14 @@ def createmaster(name, profile=None, webport=None,
         raise(Exception('Master %s already exists.\n' % name))
 
     bot = BuildMaster(unicode(name))
-    bot.slave_port = allocport(SLAVE, slaveport, Orm().session)
+    bot.slave_port = allocport(SLAVE, slaveport)
     bot.slave_passwd = unicode(genpasswd(slavepasswd))
-    bot.web_port = allocport(WEB, webport, Orm().session)
+    bot.web_port = allocport(WEB, webport)
     bot.config_source = u'loki'
 
     # SQLAlchemy Orm().session... marking where to Rollback to
     # Attempt to Allocate Server and roll back if failure
-    server = loki.server.allocserver(MASTER, profile, Orm().session)
+    server = loki.server.allocserver(MASTER, profile)
     if server is None:
         Orm().session.rollback()
         Orm().session.remove()
@@ -105,7 +105,7 @@ def createslave(name, master, profile):
 
     bot = BuildSlave(unicode(name))
 
-    server = loki.server.allocserver(SLAVE, profile, Orm().session)
+    server = loki.server.allocserver(SLAVE, profile)
     if server is None:
         Orm().session.rollback()
         Fatal('No servers available.\n')
@@ -211,7 +211,7 @@ def restart(name, action="Restart"):
     try:
         loki.remote.bot.restart(bot)
     except Exception, ex:
-        raise(Exepetion('%s Failed: %s' % (action, ex)))
+        raise(Exception('%s Failed: %s' % (action, ex)))
     Success('%s Complete' % action)
 
 

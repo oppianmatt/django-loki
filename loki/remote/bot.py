@@ -21,6 +21,7 @@ from os import tmpfile
 
 from loki.Common import *
 from loki.remote.server import getminion
+from loki.remote import check_func
 
 
 def getbot(bot):
@@ -67,7 +68,7 @@ def restart(bot):
     if status(bot):
         rbot = getbot(bot)
         rpath = getpath(bot=bot)
-        return __check_func(rbot.loki_buildbot.restart(bot.name, rpath))
+        return check_func(rbot.loki_buildbot.restart(bot.name, rpath))
     else:
         return start(bot)
 
@@ -82,7 +83,7 @@ def start(bot):
     if not status(bot):
         rbot = getbot(bot)
         rpath = getpath(bot=bot)
-        return __check_func(rbot.loki_buildbot.start(bot.name, rpath))
+        return check_func(rbot.loki_buildbot.start(bot.name, rpath))
     return None
 
 
@@ -96,7 +97,7 @@ def stop(bot):
     if status(bot):
         rbot = getbot(bot)
         rpath = getpath(bot=bot)
-        return __check_func(rbot.loki_buildbot.stop(bot.name, rpath))
+        return check_func(rbot.loki_buildbot.stop(bot.name, rpath))
     return None
 
 
@@ -110,7 +111,7 @@ def exists(bot):
     rbot = getbot(bot)
     rpath = getpath(bot=bot)
     rbot_exists = rbot.loki_buildbot.exists(bot.name, rpath)
-    return __check_func(rbot_exists)
+    return check_func(rbot_exists)
 
 
 def status(bot):
@@ -123,7 +124,7 @@ def status(bot):
     rbot = getbot(bot)
     rpath = getpath(bot=bot)
     rbot_status = rbot.loki_buildbot.status(bot.name, rpath)
-    return __check_func(rbot_status)
+    return check_func(rbot_status)
 
 
 def reload(bot):
@@ -136,7 +137,7 @@ def reload(bot):
     if status(bot):
         rbot = getbot(bot)
         rpath = getpath(bot=bot)
-        return __check_func(rbot.loki_buildbot.reload(bot.name, rpath))
+        return check_func(rbot.loki_buildbot.reload(bot.name, rpath))
     return None
 
 
@@ -149,7 +150,7 @@ def update(bot):
     """
     rbot = getbot(bot)
     rpath = getpath(bot=bot)
-    if __check_func(rbot.loki_buildbot.update(bot.name, rpath)):
+    if check_func(rbot.loki_buildbot.update(bot.name, rpath)):
         return reload(bot)
     return None
 
@@ -167,7 +168,7 @@ def create_master(bot):
     config = bot.config_source
     if exists(bot):
         raise(Exception('Master Exists on Node'))
-    return __check_func(rbot.loki_buildbot.create_master(name, config, rpath))
+    return check_func(rbot.loki_buildbot.create_master(name, config, rpath))
 
 
 def create_slave(bot):
@@ -186,7 +187,7 @@ def create_slave(bot):
     master_url = '%s:%s' % (master, port)
     if exists(bot):
         raise(Exception('Slave Exists on Node'))
-    return __check_func(rbot.loki_buildbot.create_slave(name,
+    return check_func(rbot.loki_buildbot.create_slave(name,
                                                    master_url,
                                                    passwd,
                                                    rpath))
@@ -205,41 +206,7 @@ def delete(bot):
         stop(bot)
     rbot = getbot(bot)
     rpath = getpath(bot=bot)
-    return __check_func(rbot.loki_buildbot.delete(bot.name, rpath))
-
-
-def getclasses(server, path):
-    """
-    Gets a master's classes from a path
-
-    @param bot: The server you want to get steps from
-    @type bot: SQLAlchemy Model
-    """
-    m = getminion(server.name)
-    if path == None:
-        clses = m.loki_buildbot.showclasses()
-    else:
-        clses = m.loki_buildbot.showclasses(path)
-    #clean up LokiNone strings to be type None
-    if type(clses) == types.DictType:
-        for cls in clses:
-            for param in clses[cls][2]:
-                if clses[cls][2][param] == 'LokiNone':
-                    clses[cls][2][param] = None
-    return __check_func(clses)
-
-
-def __check_func(value):
-    """
-    Check the return value of func and throw any exceptions that are found
-
-    @param value: Return value of func call
-    """
-    if type(value) == types.ListType and \
-       len(value) and \
-       value[0] == 'REMOTE_ERROR':
-        raise(Exception(('\n'.join(value))))
-    return value
+    return check_func(rbot.loki_buildbot.delete(bot.name, rpath))
 
 
 def config(bot, data):
@@ -266,4 +233,4 @@ def config(bot, data):
     if bot.type == SLAVE:
         path = "%s/%s/buildbot.tac" % (rpath, bot.name)
 
-    return __check_func(rbot.copyfile.copyfile(path, data))
+    return check_func(rbot.copyfile.copyfile(path, data))

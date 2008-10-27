@@ -15,6 +15,7 @@ Config API - handles config objects for bots
 
 import os
 import time
+import loki.remote.server
 
 from loki.Common import *
 from loki import Orm
@@ -38,10 +39,11 @@ def list(type, master=None, path=None):
     """
     #get the master if passed
     if master != None:
-        servers = Session.query(Server).filter_by(name=unicode(master),
+        servers = Orm().session.query(Server).filter_by(name=unicode(master),
                                         type=unicode('master')).all()
     else:
-        servers = Session.query(Server).filter_by(type=unicode('master')).all()
+        servers = Orm().session.query(Server).filter_by(
+                                        type=unicode('master')).all()
 
     if servers is None:
         if master != None:
@@ -52,10 +54,10 @@ def list(type, master=None, path=None):
     msg = ""
     for server in servers:
         clses = loki.remote.server.getclasses(server, path)
-        msg += "%s:\n" % color.format_string(server.name, "blue")
+        msg += "%s:\n" % Colors().format_string(server.name, "blue")
         for cls in clses:
             msg += "\t%s: %s\n" % (
-                color.format_string(cls, "white"),
+                Colors().format_string(cls, "white"),
                 _format_class(clses[cls]))
 
     Log(msg[:-1])
@@ -79,11 +81,13 @@ def add(type, bot, path, order):
     #make a Build Config Object
     if type == STEP:
         dbcls = BuildStep(unicode(path), order)
-        bot = Session.query(BuildSlave).filter_by(name=unicode(bot)).first()
+        bot = Orm().session.query(BuildSlave).filter_by(
+                                      name=unicode(bot)).first()
         cfg = bot.steps
         master = bot.master.server
     else:
-        bot = Session.query(BuildMaster).filter_by(name=unicode(bot)).first()
+        bot = Orm().session.query(BuildMaster).filter_by(
+                                      name=unicode(bot)).first()
         master = bot.server
         if type == STATUS:
             dbcls = BuildStatus(unicode(path), order)
@@ -94,7 +98,7 @@ def add(type, bot, path, order):
                 cfg = bot.schedulers
             else:
                 Fatal('%s is an invalid type.' % type)
-    Session.save(dbcls)
+    Orm().session.save(dbcls)
 
     #be sure we got a bot
     if bot == None:
@@ -129,12 +133,12 @@ def add(type, bot, path, order):
     for param in cls_dict:
         dbparam = BuildParam(unicode(param), unicode(cls_dict[param]))
         dbcls.params.append(dbparam)
-        Session.save(dbparam)
+        Orm().session.save(dbparam)
 
     #save the config object
     cfg.append(dbcls)
 
-    Session.commit()
+    Orm().session.commit()
 
     Log(showclasses(type, bot))
     return True
@@ -154,10 +158,12 @@ def delete(type, bot, order):
     @type order: integer
     """
     if type == STEP:
-        bot = Session.query(BuildSlave).filter_by(name=unicode(bot)).first()
+        bot = Orm().session.query(BuildSlave).filter_by(
+                                       name=unicode(bot)).first()
         cfg = bot.steps
     else:
-        bot = Session.query(BuildMaster).filter_by(name=unicode(bot)).first()
+        bot = Orm().session.query(BuildMaster).filter_by(
+                                       name=unicode(bot)).first()
         if type == STATUS:
             cfg = bot.statuses
         else:
@@ -171,8 +177,8 @@ def delete(type, bot, order):
     for cls in cfg:
         if int(cls.order) == int(order):
             Warn('Deleted Build Config %s' % cls)
-            Session.delete(cls)
-    Session.commit()
+            Orm().session.delete(cls)
+    Orm().session.commit()
 
 
 def _format_class(cls):
@@ -214,11 +220,11 @@ def showclasses(type, bot):
     fmt = ''
     for cls in cfg:
         fmt += "    %s: %s\n" % (
-            color.format_string(cls.order, "blue"),
-            color.format_string(cls.module, "blue"))
+            Colors().format_string(cls.order, "blue"),
+            Colors().format_string(cls.module, "blue"))
         cls.params.reverse()
         for param in cls.params:
             fmt += "\t%s: %s\n" % (
-                color.format_string(param.name, "white"),
+                Colors().format_string(param.name, "white"),
                 param.value)
     return fmt

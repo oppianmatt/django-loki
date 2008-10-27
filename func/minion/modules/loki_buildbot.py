@@ -17,46 +17,7 @@ import popen2
 import time
 import inspect
 from func.minion.modules import func_module
-
-
-class OSCommands(object):
-    """
-    Proxies common shell commands.
-    """
-
-    def __init__(self, logger = None):
-        """
-        OSCommands
-
-        @param logger: logger object to log to
-        @type logger: log.logger
-        """
-        self.logger = logger
-
-    def run_command(self, command, allow_except=True):
-        """
-        Pipe that does command dirty work with the OS.
-
-        @param command: command to run in the shell.
-        @type command: str
-
-        @return: output file object.
-        """
-        cmd = popen2.Popen4(command)
-        if cmd.wait():
-            error = '\n'.join(cmd.fromchild.readlines())
-            if self.logger is None:
-                self.logger.error('Command Failed: %s' % command)
-                self.logger.error(error)
-            #TODO: Is allow_except the way to go here?
-            if allow_except:
-                #Skipping the OSCommandError cuz it's broken
-                #raise(OSCommandError('Command Failed: %s' % command, \
-                #                         cmd, error))
-                raise(Exception('%s\n%s' % (cmd, error)))
-            else:
-                return False
-        return True
+from loki.OSCommands import OSCommands
 
 
 class BuildBotModule(func_module.FuncModule):
