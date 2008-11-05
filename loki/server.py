@@ -28,7 +28,7 @@ from loki.Colors import Colors
 from loki.Common import *
 
 
-def register(name, basedir, type, profile, comment=u''):
+def register(name, basedir, type, profile, comment=u'', virtserver=u''):
     """
     Registers a server
 
@@ -58,11 +58,12 @@ def register(name, basedir, type, profile, comment=u''):
                     unicode(type),
                     unicode(comment))
 
+    server.virtserver = get(name=unicode(virtserver))
     Orm().session.save(server)
     m = loki.remote.server.getminion(server.name)
 
     try:
-        if m.test.ping() != 1:
+        if server.virtserver == None and m.test.ping() != 1:
             raise(Exception('No response from server/func.'))
     except Exception, ex:
         Orm().session.rollback()
@@ -117,6 +118,7 @@ def get(name=None):
     @param name: the FQDN of a registered server
     @type name: str
     """
+    #get the server object
     if name != None:
         servers = Orm().session.query(
             Server).filter_by(name=unicode(name)).first()

@@ -98,7 +98,7 @@ class Server(Action):
                    '\t\t--type=master',
                    '\t\t--profile=os-arch',
                    '\t\t[--comment="vm on virt server"]'])
-    def reg(self, name, basedir, type, profile, comment=''):
+    def reg(self, name, basedir, type, profile, comment=u'', virtserver=u''):
         """
         Registers a new server
 
@@ -117,7 +117,7 @@ class Server(Action):
         @param comment: an optional comment
         @type comment: str
         """
-        loki.server.register(name, basedir, type, profile, comment)
+        loki.server.register(name, basedir, type, profile, comment, virtserver)
         Success('Server %s registered' % name)
 
     @general_help('Unregisters a new server',

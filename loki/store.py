@@ -9,16 +9,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 """
-BuildDB Setup Tasks
+Loki database management
 
 Used to initialize any resources that BuildDB uses
 """
 
+
+import ConfigParser
+
 from sqlalchemy.orm import scoped_session, sessionmaker
-from sqlalchemy import engine_from_config
+from sqlalchemy import engine_from_config, Column, types
 from loki.Common import *
 from loki.model import metadata, Config
-import ConfigParser
 
 
 def createEngine(cp, echo=False):
@@ -135,4 +137,11 @@ def updateSchema():
         Session.commit()
         Success('Schema update 1 -> 2 Complete')
     if model_v == '2':
+        Session.execute('alter table servers add column \
+virtserver_id int default 0')
+        db_v = Session.query(Config).filter_by(name=u'dbversion').first()
+        db_v.value = u'3'
+        Session.commit()
+        Success('Schema update 2 -> 3 Complete')
+    if model_v == '3':
         Success('Your Scheme is up-to-date')

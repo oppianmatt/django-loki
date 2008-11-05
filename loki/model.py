@@ -13,7 +13,6 @@ BuildDB Model
 Contains: Server, Master, Slave
 """
 
-
 from sqlalchemy import Column, MetaData, Table, types, ForeignKey
 from sqlalchemy.orm import mapper, scoped_session, sessionmaker, relation
 
@@ -29,7 +28,8 @@ servers = Table('servers', metadata,
     Column('profile', types.Unicode(50)),
     Column('basedir', types.Unicode(50)),
     Column('type', types.Unicode(10)),
-    Column('comment', types.Unicode(100)))
+    Column('comment', types.Unicode(100)),
+    Column('virtserver_id', types.Integer, ForeignKey('servers.id')))
 
 bots = Table('buildbots', metadata,
     Column('id', types.Integer, primary_key=True),
@@ -256,7 +256,8 @@ class BuildParam(object):
 
 
 server_properties = {'buildbots': relation(BuildBot, backref='server',
-                                  primaryjoin=servers.c.id==bots.c.server_id)}
+                                  primaryjoin=servers.c.id==bots.c.server_id),
+                     'virtserver': relation(Server, remote_side=servers.c.id)}
 master_properties = {'slaves': relation(BuildSlave, backref='master',
                                primaryjoin=masters.c.id==slaves.c.master_id),
                      'schedulers': relation(BuildScheduler, backref='master',
@@ -278,7 +279,10 @@ scheduler_properties = {'params': relation(BuildParam, backref='scheduler',
 
 
 ConfigMapper = mapper(Config, config)
-ServerMapper = mapper(Server, servers, properties=server_properties)
+ServerMapper = mapper(
+        Server,
+        servers,
+        properties = server_properties)#, allow_column_override=True)
 BuildBotMapper = mapper(
         BuildBot,
         bots,

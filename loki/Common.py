@@ -20,13 +20,14 @@ from loki.Colors import Colors
 SERVER='server'
 MASTER='master'
 SLAVE='slave'
+VIRT='virt'
 BUILDBOT='buildbot'
 STEP='step'
 STATUS='status'
 SCHEDULER='scheduler'
 WEB='web'
 CONFIGFILE='/etc/loki/loki.conf'
-DBVERSION='2'
+DBVERSION='3'
 
 
 def Fatal(err, ErrorCode=-1):
