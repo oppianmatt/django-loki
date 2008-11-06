@@ -13,21 +13,8 @@ and execute tasks remotely
 """
 
 import types
-import func.overlord.client as fc
-from loki.remote import check_func
-
-
-def getminion(host):
-    """
-    Gets the func client connection for the host
-
-    @param host: The host to return the connection to
-    @type host: string
-
-    @return: A func client
-    @rtype: func.overlord.client.Overload
-    """
-    return fc.Overlord(host, noglobs=True)
+import loki.remote.vm
+from loki.remote import check_func, getminion
 
 
 def status(server):
@@ -40,8 +27,14 @@ def status(server):
     @return: True or false
     @rtype: Boolean
     """
-    m = getminion(server.name)
-    return m.test.ping()
+    if server.virtserver != None:
+        if loki.remote.vm.state(server) == 'running'
+            return True
+        else:
+            return False
+    else:
+        m = getminion(server.name)
+        return m.test.ping()
 
 
 def getclasses(server, path):

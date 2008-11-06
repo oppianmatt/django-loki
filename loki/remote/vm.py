@@ -21,22 +21,38 @@ import loki.server
 from os import tmpfile
 
 from loki.Common import *
-from loki.remote.server import getminion
-from loki.remote import check_func
+from loki.remote import check_func, getminion
 
 
+def state(server):
+    """
+    Return the vm's status according to the virthost.
+    """
+    virtserver = getminion(server.virtserver.name)
+    vms = check_func(virtserver.virt.state()
+    server_name = _under_the_dots(server.name)
+    for vm in vms:
+        s = vm.split(' ')
+        if s[0] = server_name:
+            return s[1]
+    return 'nonexistant'
+
+    
 def install(cobbler, server):
     """
-    Returns the client corresponding to the bot
+    Use the func virt  module to install a vm
 
-    @param bot: The bot you wish to get the client for
-    @type bot: SQLAlchemy Model
+    @param cobbler: The fqdn of the cobbler server to provision from
+    @type cobbler: String
 
-    @return: A func client
-    @rtype: func.overlord.client.Client
+    @param server: the server object to spin up a vm off of
+    @type server: SQLAlchemy Server Object
+
+    @return: return from func
+    @rtype: func return
     """
-    server = bot.server.name
-    return getminion(server)
+    virtserver = getminion(server.virtserver.name)
+    return check_func(virtserver.virt.install(_under_the_dots(server.name)))
 
 
 def create(server):
@@ -47,7 +63,6 @@ def create(server):
     @type Server: SQLAlchemy Model
     """
     virtserver = getminion(server.virtserver.name)
-
     return check_func(virtserver.virt.create(_under_the_dots(server.name)))
 
 
@@ -59,9 +74,11 @@ def shutdown(server):
     @type Server: SQLAlchemy Model
     """
     virtserver = getminion(server.virtserver.name)
-
     return check_func(virtserver.virt.shutdown(_under_the_dots(server.name)))
 
 
 def _under_the_dots(str):
+    """
+    change all . to _ in a string
+    """
     return str.replace(".", "_")

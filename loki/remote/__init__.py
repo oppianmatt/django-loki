@@ -13,6 +13,20 @@ TODO: Document me!
 """
 
 import types
+import func.overlord.client as fc
+
+
+def getminion(host):
+    """
+    Gets the func client connection for the host
+
+    @param host: The host to return the connection to
+    @type host: string
+
+    @return: A func client
+    @rtype: func.overlord.client.Overload
+    """
+    return fc.Overlord(host, noglobs=True)
 
 
 def check_func(value):
@@ -24,5 +38,6 @@ def check_func(value):
     if type(value) == types.ListType and \
        len(value) and \
        value[0] == 'REMOTE_ERROR':
-        raise(Exception(('\n'.join(value))))
+        value = [str(i) for i in value]
+        raise(Exception('\n'.join(value)))
     return value
