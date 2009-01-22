@@ -11,6 +11,8 @@
 Django settings for web project.
 """
 
+
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -36,7 +38,7 @@ SITE_ID = 1
 USE_I18N = False
 
 # The root directory to hang off on with an ending slash
-SITE_ROOT = 'loki/'
+SITE_ROOT = ''
 
 MEDIA_ROOT = ''
 MEDIA_URL = ''
@@ -71,8 +73,8 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'web.lokiui',
-    'web.xmlrpc',
+    'loki.web.lokiui',
+    'loki.web.xmlrpc',
 )
 
 # Import all application specific settings

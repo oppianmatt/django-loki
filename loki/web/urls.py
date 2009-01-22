@@ -16,14 +16,14 @@ import os
 from django.conf import settings
 from django.conf.urls.defaults import *
 
-from web.lokiui.views import bot_status, bot_report
+from loki.web.lokiui.views import bot_status, bot_report
 
 #yui info
 YUI_PATH = os.path.join(os.path.dirname(__file__), 'yui').replace('\\', '/')
 
 
 urlpatterns = patterns('',
-    (r'^%sui/' % settings.SITE_ROOT, include('web.lokiui.urls')),
+    (r'^%s$' % settings.SITE_ROOT, include('loki.web.lokiui.urls')),
     (r'^%sservice/xmlrpc/' % settings.SITE_ROOT, include('web.xmlrpc.urls')),
 
     # serve yui files

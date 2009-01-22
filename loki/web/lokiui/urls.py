@@ -16,7 +16,7 @@ import os
 from django.conf.urls.defaults import *
 
 
-urlpatterns = patterns('web.lokiui.views',
+urlpatterns = patterns('loki.web.lokiui.views',
     # handle views
     (r'$', 'home'),
 )

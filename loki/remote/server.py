@@ -28,7 +28,7 @@ def status(server):
     @rtype: Boolean
     """
     if server.virtserver != None:
-        if loki.remote.vm.state(server) == 'running'
+        if loki.remote.vm.state(server) == 'running':
             return True
         else:
             return False

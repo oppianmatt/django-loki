@@ -47,8 +47,8 @@ def home(request):
     """
     TODO: Document me.
     """
-    masters = bot_get(MASTER, Session)
-    slaves = bot_get(SLAVE, Session)
+    masters = bot_get(MASTER)
+    slaves = bot_get(SLAVE)
     return render_to_response('home.html', locals())
 
 
@@ -56,7 +56,7 @@ def bot_status(request, botname):
     """
     TODO: Document me.
     """
-    if status(getbot(botname, Session)):
+    if status(getbot(botname)):
         botstatus = 'on'
         stsclr = 'green'
     else:
@@ -71,6 +71,6 @@ def bot_report(request, botname):
     """
     TODO: Document me.
     """
-    bot = getbot(botname, Session)
+    bot = getbot(botname)
     results = serialize_sqlalchemy(bot)
     return HttpResponse(results, mimetype='test;')

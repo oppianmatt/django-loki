@@ -1,8 +1,8 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:           loki
-Version:        0.5.0
-Release:        3%{?dist}
+Version:        0.6.0
+Release:        1%{?dist}
 Summary:        Buildbot manager application with buildbot func modules
 
 Group:          Development/Tools
@@ -53,6 +53,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Nov 12 2008 Dan Radez <dradez@redhat.com> - 0.6.0-1
+- massive changes to file structure. support to managme vm servers.
+
 * Tue Sep 30 2008 Dan Radez <dradez@redhat.com> - 0.5.0-1
 - updated version push to fedorahosted
 

@@ -38,7 +38,7 @@ class Bot(Action):
         @param type: Optional type of bot to filter by
         @type type: str
         """
-        bots = loki.bot.get()
+        bots = loki.bot.get(type=type)
         if len(bots) == 0 and type == BUILDBOT:
             Fatal("No Bots found.")
         if len(bots) == 0:

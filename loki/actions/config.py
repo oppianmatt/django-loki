@@ -47,13 +47,23 @@ class Config(Action):
         """
         loki.config.add(type, bot, module, order)
 
-    @general_help("Add a build config to a bot.",
+    @general_help("Delete a build config to a bot.",
                   {'bot': 'Bot name',
                    'order': 'numerical order to execute the step'},
-                  ['loki config delete --type=step steps.py--bot=buildslave'
+                  ['loki config delete --type=step steps.py --bot=buildslave'
                    '--order=1'])
     def delete(self, type, bot, order):
         """
         Delete a build config from a bot
         """
         loki.config.delete(type, bot, order)
+
+    
+    @general_help("Generate and write httpd conf.",
+                  {},
+                  ['loki config httpd'])
+    def httpd(self):
+        """
+        Generate and write httpd conf
+        """
+        loki.config.generate_httpd()

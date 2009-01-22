@@ -16,6 +16,8 @@ Config API - handles config objects for bots
 import os
 import time
 import loki.remote.server
+import loki.bot
+import ConfigParser
 
 from loki.Common import *
 from loki import Orm
@@ -181,23 +183,6 @@ def delete(type, bot, order):
     Orm().session.commit()
 
 
-def _format_class(cls):
-    """
-    format and return a string represenation of a class
-
-    @param cls: the class to format
-    @type cls: ('cls.path.name', (req,params), { 'opt' : 'default' } )
-    """
-    fmt = "%s(" % cls[0]
-    params = []
-    params.extend(cls[1])
-    for opt in cls[2]:
-        params.append("%s=%s" % (opt, cls[2][opt]))
-    fmt += ', '.join(params)
-    fmt += ")"
-    return fmt
-
-
 def showclasses(type, bot):
     """
     format and return a list of classes for a bot
@@ -227,4 +212,63 @@ def showclasses(type, bot):
             fmt += "\t%s: %s\n" % (
                 Colors().format_string(param.name, "white"),
                 param.value)
+    return fmt
+
+
+def generate_httpd():
+    """
+    generate an httpd conf.d file for loki web and
+    proxy passing master web interfaces
+    """
+    # Set up the config parser
+    cp = ConfigParser.ConfigParser()
+    setattr(cp, 'file_name', CONFIGFILE)
+    cp.read(cp.file_name) 
+
+    web = dict(cp.items('web'))
+    if 'enabled' not in web:
+        web['enabled'] = 'False'
+    if 'prefix' not in web:
+        web['prefix'] = ''
+
+    if web['enabled'] == 'True':
+        masters = loki.bot.get(type=MASTER)
+
+        httpd = 'RewriteEngine on\n'
+        for master in masters:
+            httpd += 'ProxyPass %s/%s/\thttp://%s:%s/\n' \
+                    % (web['prefix'], master.name, master.server, master.web_port)
+        if web['prefix'] != '':
+            httpd += 'RewriteRule ^%s$ %s/ [R,L]\n' % \
+                     (web['prefix'], web['prefix'])
+        httpd += '<Location "%s/">\n' % web['prefix']
+        httpd += '    SetHandler python-program\n'
+        httpd += '    PythonHandler django.core.handlers.modpython\n'
+        httpd += '    SetEnv DJANGO_SETTINGS_MODULE loki.web.settings\n'
+        if web['prefix'] != '':
+            httpd += '    PythonOption django.root %s\n' % web['prefix']
+        httpd += '    PythonDebug on\n'
+        httpd += '</Location>\n\n'
+        if web['prefix'] != '':
+            httpd += 'RewriteRule ^/json(.*) %s/json$1 [R,L]\n' % web['prefix']
+        httpd += 'Alias /yui /usr/lib/python2.4/site-packages/loki/web/yui\n\n'
+
+        print httpd
+        return httpd
+ 
+
+def _format_class(cls):
+    """
+    format and return a string represenation of a class
+
+    @param cls: the class to format
+    @type cls: ('cls.path.name', (req,params), { 'opt' : 'default' } )
+    """
+    fmt = "%s(" % cls[0]
+    params = []
+    params.extend(cls[1])
+    for opt in cls[2]:
+        params.append("%s=%s" % (opt, cls[2][opt]))
+    fmt += ', '.join(params)
+    fmt += ")"
     return fmt

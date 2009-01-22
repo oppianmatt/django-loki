@@ -29,11 +29,11 @@ def state(server):
     Return the vm's status according to the virthost.
     """
     virtserver = getminion(server.virtserver.name)
-    vms = check_func(virtserver.virt.state()
+    vms = check_func(virtserver.virt.state())
     server_name = _under_the_dots(server.name)
     for vm in vms:
         s = vm.split(' ')
-        if s[0] = server_name:
+        if s[0] == server_name:
             return s[1]
     return 'nonexistant'
 
