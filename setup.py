@@ -35,7 +35,7 @@ setup(name = "loki",
 
     scripts=['bin/loki'],
 
-    packages = ['loki', 'loki.actions'],
+    packages = ['loki', 'loki.actions', 'loki.remote'],
 
     py_modules = ['func.minion.modules.loki_buildbot'],
 

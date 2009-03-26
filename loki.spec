@@ -2,7 +2,7 @@
 
 Name:           loki
 Version:        0.6.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Buildbot manager application with buildbot func modules
 
 Group:          Development/Tools
