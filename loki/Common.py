@@ -17,15 +17,16 @@ import sys
 from loki.Colors import Colors
 
 
-SERVER='server'
-MASTER='master'
-SLAVE='slave'
-VIRT='virt'
-BUILDBOT='buildbot'
-STEP='step'
-STATUS='status'
-SCHEDULER='scheduler'
-WEB='web'
+SERVER=u'server'
+MASTER=u'master'
+SLAVE=u'slave'
+VIRT=u'virt'
+BUILDBOT=u'buildbot'
+STEP=u'step'
+STATUS=u'status'
+SCHEDULER=u'scheduler'
+WEB=u'web'
+
 CONFIGFILE='/etc/loki/loki.conf'
 DBVERSION='3'
 

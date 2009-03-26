@@ -15,6 +15,8 @@ Contains: Server, Master, Slave
 
 from sqlalchemy import Column, MetaData, Table, types, ForeignKey
 from sqlalchemy.orm import mapper, scoped_session, sessionmaker, relation
+from sqlalchemy.sql import and_
+from loki.Common import *
 
 metadata = MetaData()
 
@@ -261,13 +263,16 @@ server_properties = {'buildbots': relation(BuildBot, backref='server',
 master_properties = {'slaves': relation(BuildSlave, backref='master',
                                primaryjoin=masters.c.id==slaves.c.master_id),
                      'schedulers': relation(BuildScheduler, backref='master',
-                               primaryjoin=bots.c.id==configs.c.bot_id,
+                               primaryjoin=and_(bots.c.id==configs.c.bot_id,
+                                                configs.c.type==SCHEDULER),
                                cascade='all,delete-orphan'),
                      'statuses': relation(BuildStatus, backref='master',
-                               primaryjoin=bots.c.id==configs.c.bot_id,
+                               primaryjoin=and_(bots.c.id==configs.c.bot_id,
+                                                configs.c.type==STATUS),
                                cascade='all,delete-orphan')}
 slave_properties = {'steps': relation(BuildStep, backref='slave',
-                            primaryjoin=bots.c.id==configs.c.bot_id,
+                            primaryjoin=and_(bots.c.id==configs.c.bot_id,
+                                             configs.c.type==STEP),
                             order_by=configs.c.order,
                             cascade='all,delete-orphan')}
 step_properties = {'params': relation(BuildParam, backref='step',

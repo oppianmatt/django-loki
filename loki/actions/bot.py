@@ -48,7 +48,7 @@ class Bot(Action):
             status = Colors().format_string("off", "red")
             if loki.remote.bot.status(bot) is True:
                 status = Colors().format_string("on", "green")
-            msg = "%s: %s .... %s\n" % \
+            msg = "%20s: %30s  %5s\n" % \
                   (Colors().format_string(bot.name, "white"),
                    Colors().format_string(bot.server.name, 'blue'),
                    status)
@@ -87,6 +87,10 @@ class Bot(Action):
                        bot.slave_port,
                        bot.web_port,
                        bot.slave_passwd)
+                masters += '\n\tSlaves: '
+                for slave in bot.slaves:
+                    masters += '\t%s\n\t' % slave.name
+
             if bot.server.type == SLAVE:
                 slaves += "%s: %s\n\tServer: %s\n\tType: %s\
                             \n\tMaster: %s\n\tProfile: %s\n" %\

@@ -24,7 +24,7 @@ from director.filter import Filter
 if __name__ == '__main__':
     # 'actions.package' is the package that holds the allowed plugin actions
     filter = Filter()
-    filter.register_filter(ExceptionFilter(Exception, "TEST %s"))
+    #filter.register_filter(ExceptionFilter(Exception, "TEST %s"))
 
     # 'actions.package' is the package that holds the allowed plugin actions
     ar = ActionRunner(sys.argv, 'loki.actions')
