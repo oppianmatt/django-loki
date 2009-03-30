@@ -39,9 +39,8 @@ def Fatal(err, ErrorCode=-1):
     @type err: string
     """
 
-    err = Colors().format_string(err, 'red')
-    sys.stderr.write(err+'\n')
-    sys.exit(ErrorCode)
+    Error(err)
+    sys.exit(ErrorCode) 
 
 
 def Success(msg):
@@ -91,7 +90,7 @@ def Error(msg):
     @type msg: string
     """
     msg = Colors().format_string(msg, 'red')
-    print msg
+    sys.stderr.write(msg + "\n")
 
     return True
 

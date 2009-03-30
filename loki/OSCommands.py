@@ -15,6 +15,8 @@ Classes related to running commands locally on a Linux box.
 import os
 import popen2
 
+from Common import Error
+
 # TODO: change the buildbot commands to use the buildbot libs
 
 
@@ -75,7 +77,7 @@ class OSCommands(object):
         cmd = popen2.Popen4(command)
         if cmd.wait():
             error = '\n'.join(cmd.fromchild.readlines())
-            if self.logger is None:
+            if self.logger is not None:
                 self.logger.error('Command Failed: %s' % command)
                 self.logger.error(error)
             else:
