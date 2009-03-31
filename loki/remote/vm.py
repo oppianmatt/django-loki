@@ -37,7 +37,7 @@ def state(server):
             return s[1]
     return 'nonexistant'
 
-    
+
 def install(cobbler, server):
     """
     Use the func virt  module to install a vm

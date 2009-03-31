@@ -58,7 +58,6 @@ class Config(Action):
         """
         loki.config.delete(type, bot, order)
 
-    
     @general_help("Generate and write httpd conf.",
                   {},
                   ['loki config httpd'])

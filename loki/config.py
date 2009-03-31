@@ -223,7 +223,7 @@ def generate_httpd():
     # Set up the config parser
     cp = ConfigParser.ConfigParser()
     setattr(cp, 'file_name', CONFIGFILE)
-    cp.read(cp.file_name) 
+    cp.read(cp.file_name)
 
     web = dict(cp.items('web'))
     if 'enabled' not in web:
@@ -237,7 +237,10 @@ def generate_httpd():
         httpd = 'RewriteEngine on\n'
         for master in masters:
             httpd += 'ProxyPass %s/%s/\thttp://%s:%s/\n' \
-                    % (web['prefix'], master.name, master.server, master.web_port)
+                    % (web['prefix'],
+                       master.name,
+                       master.server,
+                       master.web_port)
         if web['prefix'] != '':
             httpd += 'RewriteRule ^%s$ %s/ [R,L]\n' % \
                      (web['prefix'], web['prefix'])
@@ -255,7 +258,7 @@ def generate_httpd():
 
         print httpd
         return httpd
- 
+
 
 def _format_class(cls):
     """

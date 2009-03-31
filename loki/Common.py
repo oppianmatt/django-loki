@@ -40,7 +40,7 @@ def Fatal(err, ErrorCode=-1):
     """
 
     Error(err)
-    sys.exit(ErrorCode) 
+    sys.exit(ErrorCode)
 
 
 def Success(msg):
