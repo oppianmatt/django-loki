@@ -87,7 +87,7 @@ class Bot(Action):
                        bot.slave_port,
                        bot.web_port,
                        bot.slave_passwd)
-                masters += '\n\tSlaves: '
+                masters += '\n\tSlaves:\n\t'
                 for slave in bot.slaves:
                     masters += '\t%s\n\t' % slave.name
 
