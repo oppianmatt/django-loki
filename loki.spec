@@ -1,8 +1,8 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:           loki
-Version:        0.6.0
-Release:        3%{?dist}
+Version:        0.6.1
+Release:        2%{?dist}
 Summary:        Buildbot manager application with buildbot func modules
 
 Group:          Development/Tools

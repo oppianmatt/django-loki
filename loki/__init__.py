@@ -10,7 +10,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-__VERSION__ = '0.5.0'
+__VERSION__ = '0.6.1'
 __LICENSE__ = 'GPLv3'
 
 from loki.store import createSession, getConfig

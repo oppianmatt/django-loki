@@ -365,7 +365,7 @@ def generate_config(name):
             buildslaves += "\n    BuildSlave('%s', '%s')," % \
                 (slave.name, bot.slave_passwd)
             #create buildfactory
-            b = '%s_%s' % (bot.name, slave.name)
+            b = '%s_%s' % (bot.name, slave.name.replace('-', '_'))
             factories += '%s = factory.BuildFactory()\n' % b
             for step in slave.steps:
                 if step.module not in modules:
