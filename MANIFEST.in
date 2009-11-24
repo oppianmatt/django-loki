@@ -1,6 +1,0 @@
-include AUTHORS
-include LICENSE
-include COPYING
-include INSTALL
-include etc/loki.conf
-include etc/log.conf
