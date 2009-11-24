@@ -11,15 +11,17 @@
 from django.conf import settings
 from django.conf.urls.defaults import *
 from django.contrib import admin
+from django.contrib.auth.views import login
+from django.contrib.auth.views import logout_then_login
 
 
 # App views
 urlpatterns = patterns('loki.views',
     (r'^$', 'home'),
+    (r'^login/$', login),
+    (r'^logout/$', logout_then_login),
     (r'^introspect/(steps|status|scheduler)/', 'introspect'),
     (r'^admin/', include(admin.site.urls)),
     (r'^([^/]+)/$', 'home'),
-    (r'^([^/]+)/(start|stop|reconfig)/$', 'home'),
     (r'^([^/]+)/([^/]+)/$', 'home'),
-    (r'^([^/]+)/([^/]+)/(start|stop|reconfig)/$', 'home'),
 )

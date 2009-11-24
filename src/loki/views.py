@@ -8,23 +8,31 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+import time
+
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.decorators import user_passes_test
 
 from loki.models import Master, Slave, Config, ConfigParam
 from loki.models import Status, Step, Scheduler
 from loki.model_helpers import introspect_module
 
 
-def home(request, master=None, slave=None, action=None):
+def home(request, master=None, slave=None):
     context = {}
     context['bots'] = Master.objects.all()
+    action = None
+    if request.method == 'GET' and 'action' in request.GET:
+        if request.GET['action'] in ['start', 'stop', 'reconfig']:
+            action = request.GET['action']
     if slave:
         slave = Slave.objects.get(name=slave)
         if action:
             slave.buildbot_run(action)
+            time.sleep(3)
             return HttpResponseRedirect(reverse('loki.views.home',
                                         args=[slave.master.name, slave.name]))
         context['slave'] = slave
@@ -32,12 +40,14 @@ def home(request, master=None, slave=None, action=None):
         master = Master.objects.get(name=master)
         if action:
             master.buildbot_run(action)
+            time.sleep(3)
             return HttpResponseRedirect(reverse('loki.views.home',
                                             args=[master.name]))
         context['master'] = master
     return render_to_response('loki/home.html', context)
 
 
+@user_passes_test(lambda u: u.is_superuser)
 def introspect(request, type):
     # do import if we're importing
     if request.method == 'POST' and 'import' in request.POST:

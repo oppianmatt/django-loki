@@ -15,7 +15,7 @@
     </td>
     <td valign="top" width="90%">
         {% if master %}
-            <b>{{ master }}</b> {% if master.alive %}On - <a href="/{{ master }}/stop/">Stop</a>{% else %}Off - <a href="/{{ master }}/start/">Start</a>{% endif %}<br>
+            <b>{{ master }}</b> {% if master.alive %}On - <a href="/{{ master }}/?action=stop">Stop</a>{% else %}Off - <a href="/{{ master }}/?action=start">Start</a>{% endif %}<br>
             host: {{ master.host }}<br>
             slave/web ports: {{ master.slave_port }}/{{ master.web_port }}<br>
             status: {{ master.status.all }}
@@ -23,7 +23,7 @@
             {{ master.pid }}
         {% endif %}
         {% if slave %}
-            <b>{{ slave }}</b> {% if slave.alive %}On - <a href="/{{ slave.master }}/{{ slave }}/stop/">Stop</a>{% else %}Off - <a href="/{{ slave.master }}/{{ slave }}/start/">Start</a>{% endif %}<br>
+            <b>{{ slave }}</b> {% if slave.alive %}On - <a href="/{{ slave.master }}/{{ slave }}/?action=stop">Stop</a>{% else %}Off - <a href="/{{ slave.master }}/{{ slave }}/?action=start">Start</a>{% endif %}<br>
             host: {{ slave.host }}<br>
             steps: {{ slave.steps.all }}
             {{ slave.pid }}
