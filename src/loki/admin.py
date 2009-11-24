@@ -12,37 +12,46 @@ from loki.models import *
 from django.contrib import admin
 from django.contrib.contenttypes import generic
 
-# inlines
+
 class ConfigParamInline(admin.TabularInline):
     model = ConfigParam
+
 
 class StatusParamInline(admin.TabularInline):
     model = StatusParam
 
+
 class StepParamInline(admin.TabularInline):
     model = StepParam
+
 
 class SchedulerParamInline(admin.TabularInline):
     model = SchedulerParam
 
-# admins
+
 class HostAdmin(admin.ModelAdmin):
     pass
+
 
 class MasterAdmin(admin.ModelAdmin):
     pass
 
+
 class SlaveAdmin(admin.ModelAdmin):
     pass
 
+
 class ConfigAdmin(admin.ModelAdmin):
-    inlines = [ ConfigParamInline, ]
+    inlines = [ConfigParamInline, ]
+
 
 class StatusAdmin(admin.ModelAdmin):
-    inlines = [ StatusParamInline, ]
+    inlines = [StatusParamInline, ]
+
 
 class StepAdmin(admin.ModelAdmin):
-    inlines = [ StepParamInline, ]
+    inlines = [StepParamInline, ]
+
 
 class SchedulerAdmin(admin.ModelAdmin):
-    inlines = [ SchedulerParamInline, ]
+    inlines = [SchedulerParamInline, ]

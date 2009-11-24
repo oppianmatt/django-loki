@@ -11,12 +11,14 @@
 import os
 import inspect
 
+
 def _template(tpl, **vars):
     """
     tpl: template file path
     **vars: variables to interpolate into the template
     """
     return open(tpl, 'r').read() % vars
+
 
 def _generate_class(cls):
     """
@@ -25,11 +27,12 @@ def _generate_class(cls):
     gcls = cls.type.module.split('.')[-1]
     gprm = []
     for param in cls.params.all():
-        if param.val[0] in ['[','{']:
+        if param.val[0] in ['[', '{']:
             gprm.append("%s=%s" % (param.type.name, param.val))
         else:
             gprm.append("%s='%s'" % (param.type.name, param.val))
     return "%s(%s)" % (gcls, ', '.join(gprm))
+
 
 def introspect_module(path='buildbot.steps'):
     """
@@ -83,7 +86,7 @@ def introspect_module(path='buildbot.steps'):
                             if i_init_defaults[c] == None:
                                 opt[a] = None
                                 # XMLRPC can't handle None, this was used when
-                                #we were using func to do this. 
+                                #we were using func to do this.
                                 #opt[a] = 'LokiNone'
                             else:
                                 opt[a] = i_init_defaults[c]

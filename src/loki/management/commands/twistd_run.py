@@ -15,7 +15,10 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import re, os.path, os, sys
+import re
+import os
+import os.path
+import sys
 
 from twisted.web2 import log, wsgi, resource, iweb
 from twisted.internet import reactor
@@ -27,32 +30,35 @@ from django.core.servers.basehttp import AdminMediaHandler
 SSL_PRIVATE_KEY_PATH = None
 LOG_STYLE = "apache"
 
-for k, v in os.environ.items() :
-    if k.startswith("DOT_") :
+for k, v in os.environ.items():
+    if k.startswith("DOT_"):
         locals()[k.replace("DOT_", "")] = v
 
-if not os.path.isdir("../log") :
-    os.mkdir("../log")
+if not os.path.isdir("twistd"):
+    os.mkdir("twistd")
 
-def write_pid (file_pid) :
+
+def write_pid(file_pid):
     fd = file(file_pid, "w")
     fd.write(str(os.getpid()))
     fd.close()
 
-def make_wsgi (req) :
+
+def make_wsgi(req):
     # twisted.web2 can not insert 'PATH_INFO' into environment.
     os.environ["PATH_INFO"] = req.path
     os.environ["SCRIPT_URL"] = req.path
 
     return wsgi.WSGIResource(AdminMediaHandler(WSGIHandler()))
 
-class ArbitrarySettingsDecide (resource.Resource) :
+
+class ArbitrarySettingsDecide(resource.Resource):
     addSlash = True
 
-    def locateChild (self, request, segments) :
+    def locateChild(self, request, segments):
         return self, ()
 
-    def renderHTTP (self, request) :
+    def renderHTTP(self, request):
         return make_wsgi(request)
 
 LOG_FORMAT = \
@@ -71,18 +77,19 @@ User-Agnet: %s
 LOG_FORMAT_APACHE = "%s - %s [%s] \"%s\" %s %d \"%s\" \"%s\""
 RE_NOT_LOG = re.compile("\.(css|js|png|gif|jpg)$")
 
-class AccessLoggingObserver (log.DefaultCommonAccessLoggingObserver) :
 
-    def start (self, log_type="") :
+class AccessLoggingObserver(log.DefaultCommonAccessLoggingObserver):
+
+    def start(self, log_type=""):
         self.log_type = log_type
         log.DefaultCommonAccessLoggingObserver.start(self)
 
-    def emit (self, eventDict) :
+    def emit(self, eventDict):
         if eventDict.get("interface") is not iweb.IRequest:
             return
 
         request = eventDict["request"]
-        if RE_NOT_LOG.search(request.uri) :
+        if RE_NOT_LOG.search(request.uri):
             return
         response = eventDict["response"]
         loginfo = eventDict["loginfo"]
@@ -91,33 +98,33 @@ class AccessLoggingObserver (log.DefaultCommonAccessLoggingObserver) :
             request.uri,
             ".".join([str(x) for x in request.clientproto]))
 
-        if self.log_type == "apache" :
-            self.logMessage( \
-                 LOG_FORMAT_APACHE %( \
-                    request.remoteAddr.host, \
-                    # XXX: Where to get user from? \
-                    "-", \
-                    self.logDateString( \
-                         response.headers.getHeader("date", 0)), \
-                    firstLine, \
-                    response.code, \
-                    loginfo.bytesSent, \
-                    request.headers.getHeader("referer", "-"), \
-                    request.headers.getHeader("user-agent", "-") \
-                    ) \
+        if self.log_type == "apache":
+            self.logMessage(
+                 LOG_FORMAT_APACHE %(
+                    request.remoteAddr.host,
+                    # XXX: Where to get user from?
+                    "-",
+                    self.logDateString(
+                         response.headers.getHeader("date", 0)),
+                    firstLine,
+                    response.code,
+                    loginfo.bytesSent,
+                    request.headers.getHeader("referer", "-"),
+                    request.headers.getHeader("user-agent", "-"),
+                    )
                 )
-        else :
-            self.logMessage( \
+        else:
+            self.logMessage(
                 LOG_FORMAT % (
-                        request.headers.getRawHeaders("x-requested-with") or "",
-                        request.remoteAddr.host,
-                        # XXX: Where to get user from?
-                        #self.logDateString(response.headers.getHeader("date", 0)),
-                        firstLine,
-                        response.code,
-                        loginfo.bytesSent,
-                        request.headers.getHeader("user-agent", "-"),
-                        request.headers.getHeader("referer", "-"),
+                    request.headers.getRawHeaders("x-requested-with") or "",
+                    request.remoteAddr.host,
+                    # XXX: Where to get user from?
+                    #self.logDateString(response.headers.getHeader("date", 0)),
+                    firstLine,
+                    response.code,
+                    loginfo.bytesSent,
+                    request.headers.getHeader("user-agent", "-"),
+                    request.headers.getHeader("referer", "-"),
                     )
                 )
 
@@ -143,15 +150,15 @@ if __name__ == "__builtin__":
     #s.setServiceParent(application)
 
     # HTTPs, Serve it via standard HTTP on port 8081
-    if not SSL_PRIVATE_KEY_PATH :
+    if not SSL_PRIVATE_KEY_PATH:
         # HTTP, Serve it via standard HTTP on port 8000
         s = strports.service("tcp:%s" % __port, channel.HTTPFactory(site))
         s.setServiceParent(application)
-    else :
+    else:
         from twisted.internet.ssl import DefaultOpenSSLContextFactory
-        s = strports.service( \
-            "ssl:%s:privateKey=%s" % (__port, SSL_PRIVATE_KEY_PATH), \
-            channel.HTTPFactory(site) \
+        s = strports.service(
+            "ssl:%s:privateKey=%s" % (__port, SSL_PRIVATE_KEY_PATH),
+            channel.HTTPFactory(site),
         )
         s.setServiceParent(application)
 
@@ -171,5 +178,4 @@ Usage
 
 """
 
-__author__ =  "Spike^ekipS <spikeekips@gmail.com>"
-
+__author__ = "Spike^ekipS <spikeekips@gmail.com>"

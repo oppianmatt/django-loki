@@ -15,6 +15,7 @@ from loki.settings import *
 from loki.helpers import generate_master_cfg
 from buildbot.scripts.runner import Options, createMaster
 
+
 def post_save_bot(sender, instance, created, **kwargs):
     """
     post save call back

@@ -17,15 +17,16 @@ from loki.models import Master, Slave, Config, ConfigParam
 from loki.models import Status, Step, Scheduler
 from loki.model_helpers import introspect_module
 
+
 def home(request, master=None, slave=None, action=None):
     context = {}
     context['bots'] = Master.objects.all()
     if slave:
-        slave = Slave.objects.get(name=slave) 
+        slave = Slave.objects.get(name=slave)
         if action:
             slave.buildbot_run(action)
             return HttpResponseRedirect(reverse('loki.views.home',
-                                            args=[slave.master.name, slave.name]))
+                                        args=[slave.master.name, slave.name]))
         context['slave'] = slave
     elif master:
         master = Master.objects.get(name=master)
@@ -35,6 +36,7 @@ def home(request, master=None, slave=None, action=None):
                                             args=[master.name]))
         context['master'] = master
     return render_to_response('loki/home.html', context)
+
 
 def introspect(request, type):
     # do import if we're importing
@@ -56,14 +58,15 @@ def introspect(request, type):
             for req in imported_config[1]:
                 ConfigParam.objects.create(type=new_config, name=req,
                                            required=True).save()
-            for opt,default in imported_config[2].items():
+            for opt, default in imported_config[2].items():
                 ConfigParam.objects.create(type=new_config, name=opt,
                                            default=str(default)).save()
         except Exception, e:
             new_config.delete()
             raise e
 
-        return HttpResponseRedirect(reverse('loki.views.introspect', args=[type]))
+        return HttpResponseRedirect(reverse('loki.views.introspect',
+                                    args=[type]))
 
     # not importing so get configs in the db and configs from the path
     configs = [mod[0] for mod in Config.objects.values_list('module')]
@@ -83,8 +86,7 @@ def introspect(request, type):
         del introspected[del_class]
 
     # render
-    context = { 'path': path,
+    context = {'path': path,
                 'type': type,
                 'classes': introspected, }
     return render_to_response('loki/introspect.html', context)
-

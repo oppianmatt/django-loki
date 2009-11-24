@@ -45,17 +45,18 @@ class Host(models.Model):
     def __unicode__(self):
         return self.hostname
 
+
 class Bot(models.Model):
 
-    class Meta(object): 
-        """ 
-        Meta attributes for Package. 
-        """ 
+    class Meta(object):
+        """
+        Meta attributes for Package.
+        """
         abstract = True
 
     def buildbot_run(self, action):
         build_bot_run([action, self.path])
-        
+
     def pid(self):
         pid = 0
         pid_file = os.path.join(self.path, 'twistd.pid')
@@ -67,6 +68,7 @@ class Bot(models.Model):
 
     alive = property(lambda self: self.pid() and \
                 os.path.exists(os.path.join('/proc', str(self.pid()))))
+
 
 class Master(Bot):
     host = models.ForeignKey(Host, related_name='masters')
@@ -139,6 +141,7 @@ class Master(Bot):
         cfg.write(t)
         cfg.close()
 
+
 class Slave(Bot):
     host = models.ForeignKey(Host, related_name='slaves')
     master = models.ForeignKey(Master, related_name='slaves')
@@ -164,6 +167,7 @@ class Slave(Bot):
         cfg.write(t)
         cfg.close()
 
+
 class Config(models.Model):
     """
     A definition of what configs are available
@@ -171,11 +175,10 @@ class Config(models.Model):
     name = models.CharField(max_length=25)
     module = models.CharField(max_length=200, unique=True)
     content_type = models.ForeignKey(ContentType)
-    #object_id = models.PositiveIntegerField()
-    #content_object = generic.GenericForeignKey('content_type', 'object_id')
 
     def __unicode__(self):
         return self.name
+
 
 class ConfigParam(models.Model):
     name = models.CharField(max_length=25)
@@ -189,6 +192,7 @@ class ConfigParam(models.Model):
             req = ' *'
         return '%s :: %s%s' % (self.type, self.name, req)
 
+
 class Status(models.Model):
     master = models.ForeignKey(Master, related_name='status')
     type = models.ForeignKey(Config, related_name='status_type',
@@ -198,14 +202,15 @@ class Status(models.Model):
     def __unicode__(self):
         return '%s :: %s' % (self.master, self.type)
 
+
 class StatusParam(models.Model):
     status = models.ForeignKey(Status, related_name='params')
     type = models.ForeignKey(ConfigParam)
     val = models.CharField(max_length=200)
 
-
     def __unicode__(self):
         return '%s :: %s' % (self.status, self.val)
+
 
 class Step(models.Model):
     slave = models.ForeignKey(Slave, related_name='steps')
@@ -213,18 +218,18 @@ class Step(models.Model):
                              limit_choices_to={
                                  'content_type': step_content_type})
 
-
     def __unicode__(self):
         return '%s :: %s' % (self.slave, self.type)
+
 
 class StepParam(models.Model):
     step = models.ForeignKey(Step, related_name='params')
     type = models.ForeignKey(ConfigParam)
     val = models.CharField(max_length=200)
 
-
     def __unicode__(self):
         return '%s :: %s' % (self.step, self.val)
+
 
 class Scheduler(models.Model):
     slave = models.ForeignKey(Slave, related_name='schedulers')
@@ -235,11 +240,11 @@ class Scheduler(models.Model):
     def __unicode__(self):
         return '%s :: %s' % (self.slave, self.type)
 
+
 class SchedulerParam(models.Model):
     scheduler = models.ForeignKey(Scheduler, related_name='params')
     type = models.ForeignKey(ConfigParam)
     val = models.CharField(max_length=200)
-
 
     def __unicode__(self):
         return '%s :: %s' % (self.scheduler, self.val)

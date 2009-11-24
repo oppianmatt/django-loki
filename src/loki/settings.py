@@ -12,5 +12,7 @@ import os
 from django.conf import settings
 
 BUILDBOT_BASE = getattr(settings, 'BUILDBOT_BASE', 'buildbots')
-BUILDBOT_MASTERS = getattr(settings, 'BUILDBOT_MASTERS', os.path.join(BUILDBOT_BASE, 'masters'))
-BUILDBOT_SLAVES = getattr(settings, 'BUILDBOT_SLAVES', os.path.join(BUILDBOT_BASE, 'slaves'))
+BUILDBOT_MASTERS = getattr(settings, 'BUILDBOT_MASTERS',
+                             os.path.join(BUILDBOT_BASE, 'masters'))
+BUILDBOT_SLAVES = getattr(settings, 'BUILDBOT_SLAVES',
+                             os.path.join(BUILDBOT_BASE, 'slaves'))

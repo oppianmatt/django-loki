@@ -24,6 +24,7 @@ from loki.thread import BuildBotStart
 
 loki_pwd = os.path.abspath('.')
 
+
 def build_bot_run(options):
     if '--quiet' not in options:
         options.insert(1, '--quiet')
@@ -47,16 +48,16 @@ def build_bot_run(options):
     elif command == "create-slave":
         createSlave(so)
     elif command == "start":
-        ## adapted from 
-        ## http://stackoverflow.com/questions/972362/spawning-process-from-python
-        ## similar recipe http://code.activestate.com/recipes/278731/
+    ## adapted from
+    ## http://stackoverflow.com/questions/972362/spawning-process-from-python
+    ## similar recipe http://code.activestate.com/recipes/278731/
         child_pid = os.fork()
         if child_pid == 0:
             # forked child becomes session leader
             os.setsid()
             g_child_pid = os.fork()
             if g_child_pid == 0:
-                # second forked process now a non-session-leader, 
+                # second forked process now a non-session-leader,
                 # detached from parent, must now close all open files
                 try:
                     maxfd = os.sysconf("SC_OPEN_MAX")
@@ -65,9 +66,10 @@ def build_bot_run(options):
 
                 for fd in range(maxfd):
                     try:
-                       os.close(fd)
-                    except OSError: # ERROR, fd wasn't open to begin with (ignored)
-                       pass
+                        os.close(fd)
+                    except OSError:
+                    # ERROR, fd wasn't open to begin with (ignored)
+                        pass
 
                 # finally execute the buildbot start script
                 from buildbot.scripts.startup import start
