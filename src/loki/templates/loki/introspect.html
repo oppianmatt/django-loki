@@ -1,0 +1,22 @@
+<form action="{% url loki.views.introspect type %}">
+introspect: <input type="text" name="path" value="{{ path }}">
+<input name="submit" type="submit" value="Go">
+</form><hr>
+{% for name,details in classes.items %}
+    <form method="post" action="{% url loki.views.introspect type %}">
+    {{ name }} :: {{ details.0 }}<br>
+    <input type="hidden" name="import" value="{{ details.0 }}">
+    <table>
+    {% for req in details.1 %}
+    <tr>
+        <td>{{ req }}</td><td>&nbsp;</td><td><i>Required</i></td>
+    </tr>
+    {% endfor %}
+    {% for opt,def in details.2.items %}
+    <tr>
+        <td>{{ opt }}</td><td>&nbsp;</td><td>{{ def }}</td>
+    </tr>
+    {% endfor %}
+    </table><input name="submit" type="submit" value="import"></form><hr>
+
+{% endfor %}

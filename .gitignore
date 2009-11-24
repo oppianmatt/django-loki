@@ -1,6 +1,8 @@
-# Items we should all ignore
+# Files to ignore
 *.pyc
 *.pyo
 *.db
-*.swp
 *.patch
+example_project/buildbots/
+example_project/twistd/
+docs/html

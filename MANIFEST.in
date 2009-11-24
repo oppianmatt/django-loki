@@ -1,0 +1,9 @@
+include AUTHORS
+include LICENSE
+include MANIFEST.in
+include COPYING
+include *.spec
+recursive-include doc *
+recursive-include src/loki *
+exclude src/example_project/buildbots
+exclude src/example_project/loki.db

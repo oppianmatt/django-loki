@@ -1,0 +1,18 @@
+Loki Quick Start
+------------------------
+deps: Django 1.0, createrepo, sqlite, python-ldap (or other db)
+
+1: if you're using a different db engine update example_project/settings.py
+
+2: create dirs:
+example_project/buildbots/
+example_project/buildbots/masters/
+example_project/buildbots/slaves/
+
+3: in project dir run ./manage.py syncdb --noinput 
+
+4: in project dir run ./manage.py runserver
+connect to http://localhost:8000/admin
+or
+4: in project dir run ./manage.py twistd
+connect to http://localhost:8001/admin
