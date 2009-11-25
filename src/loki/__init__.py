@@ -77,6 +77,9 @@ def build_bot_run(options):
             else:
                 # done with child process
                 os._exit(0)
+        else:
+            os.waitpid(child_pid, 0)
+                
     elif command == "stop":
         stop(so, wait=True)
     elif command == "restart":
