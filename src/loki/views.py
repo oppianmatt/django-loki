@@ -32,7 +32,7 @@ def home(request, master=None, slave=None):
         slave = Slave.objects.get(name=slave)
         if action:
             slave.buildbot_run(action)
-            time.sleep(3)
+            time.sleep(1)
             return HttpResponseRedirect(reverse('loki.views.home',
                                         args=[slave.master.name, slave.name]))
         context['slave'] = slave
@@ -40,7 +40,7 @@ def home(request, master=None, slave=None):
         master = Master.objects.get(name=master)
         if action:
             master.buildbot_run(action)
-            time.sleep(3)
+            time.sleep(1)
             return HttpResponseRedirect(reverse('loki.views.home',
                                             args=[master.name]))
         context['master'] = master

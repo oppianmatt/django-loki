@@ -1,0 +1,29 @@
+<!-- % extends "loki/base.html" % -->
+
+{% block title %}Please Login{% endblock %}
+{% block content %}
+{% if form.errors %}
+<p>Your username and password didn't match. Please try again.</p>
+{% endif %}
+
+<form method="post" action=".">
+<table align="center">
+<tr>
+    <td>{{ form.username.label_tag }}</td>
+    <td>{{ form.username }}</td>
+</tr>
+<tr>
+    <td>{{ form.password.label_tag }}</td>
+    <td>{{ form.password }}</td>
+</tr>
+<tr>
+    <td colspan ="2" align="right">
+    <input type="submit" value="login" />
+    <input type="hidden" name="next" value="{{ next }}" />
+    </td>
+</table>
+</form>
+
+
+{% endblock %}
+

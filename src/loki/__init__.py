@@ -74,10 +74,12 @@ def build_bot_run(options):
                 # finally execute the buildbot start script
                 from buildbot.scripts.startup import start
                 start(so)
+                os._exit(0)
             else:
                 # done with child process
                 os._exit(0)
         else:
+            print 'waiting'
             os.waitpid(child_pid, 0)
                 
     elif command == "stop":
