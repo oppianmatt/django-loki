@@ -17,13 +17,15 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.decorators import user_passes_test
 
 from loki.models import Master, Slave, Config, ConfigParam
-from loki.models import Status, Step, Scheduler
+from loki.models import Status, Step, StepParam, Scheduler
 from loki.model_helpers import introspect_module
+from loki.forms import ConfigParamFormSet
 
 
 def home(request, master=None, slave=None):
     context = {}
     context['bots'] = Master.objects.all()
+    context['steps'] = Config.objects.all()
     action = None
     if request.method == 'GET' and 'action' in request.GET:
         if request.GET['action'] in ['start', 'stop', 'reconfig']:
@@ -36,6 +38,7 @@ def home(request, master=None, slave=None):
             return HttpResponseRedirect(reverse('loki.views.home',
                                         args=[slave.master.name, slave.name]))
         context['slave'] = slave
+        return render_to_response('loki/slave.html', context)
     elif master:
         master = Master.objects.get(name=master)
         if action:
@@ -44,7 +47,58 @@ def home(request, master=None, slave=None):
             return HttpResponseRedirect(reverse('loki.views.home',
                                             args=[master.name]))
         context['master'] = master
+        return render_to_response('loki/master.html', context)
     return render_to_response('loki/home.html', context)
+
+
+def config_step(request, pk):
+    config = Config.objects.get(pk=pk)
+    context = {'config': config, }
+    return render_to_response('loki/ajax/config.html', context)
+
+
+def config_step_save(request, bot_id):
+    if request.method == 'POST':
+        try:
+            slave = Slave.objects.get(id=bot_id) 
+            print request.POST
+            data = request.POST.copy()
+            # get a step or create a newone
+            if 'step_id' in data and data['step_id']:
+                step = Step.objects.get(id=data['step_id'])
+                step.num = data['step_num']
+                del data['step_id']
+            else:
+                config = Config.objects.get(id=data['step_type_id'])
+                step = Step(slave=slave, type=config, num=data['step_num'])
+                step.save()
+                del data['step_type_id']
+            del data['step_num']
+
+            params_2_add = []
+            # update existing params
+            for p in step.params.all():
+                #TODO: update existing params
+                #      only to creating a new one
+                #      so just passing for now
+                # how: check if default, if changed, save it
+                #      then delete the key from the dict
+                #      so it's not reprocessed
+                #      and add the param to the params 2 add
+                pass
+            # add new params
+            for p, v in data.items():
+                param_type = ConfigParam.objects.get(id=p)
+                if v != param_type.default:
+                    param = StepParam(step=step, type=param_type, val=v)
+                    params_2_add.append(param)
+            step.params = params_2_add
+            step.save()
+        except Exception, e:
+            print e
+
+    context = { }
+    return render_to_response('loki/ajax/config.html', context)
 
 
 @user_passes_test(lambda u: u.is_superuser)

@@ -1,0 +1,36 @@
+{% extends "loki/base.html" %}
+    {% load loki_tags %}
+    {% block script %}
+        $("form#addstep").submit(function(){
+            $("div#steps div#newstep").load('/ajax/config/step/' + this.step.value);
+            return false;
+        });
+    {% endblock %}
+    {% block head %}
+    <script>
+        function savestep(form_name){
+          $.post('/ajax/config/step/save/{{ slave.id }}/', $("form#" + form_name).serialize(), alert('success'));
+        };
+    </script>
+    {% endblock %}
+    {% block content %}
+        {% block title %}Slave: {{ slave }}{% endblock %}
+        <b>{{ slave }}</b> {% if slave.alive %}On - <a href="/{{ slave.master }}/{{ slave }}/?action=stop">Stop</a>{% else %}Off - <a href="/{{ slave.master }}/{{ slave }}/?action=start">Start</a>{% endif %}<br>
+        host: {{ slave.host }}<br>
+        steps:<br>
+        <div id="steps" style="float: left;">
+        {% for s in slave.steps.all %}
+        {% step s %}
+        {% endfor %}
+        <div id="newstep" style="float: left; clear: left;"/>
+        </div><br>
+        <form id="addstep" name="addstep" action="javascript:;" style="clear:left;">
+            <select id="step" name="step">
+            {% for s in steps %}
+                <option value="{{ s.pk }}">{{ s.name }} :: {{ s.module }}</option>
+            {% endfor %}
+            </select>
+            <input type="submit" value="Add Step">
+        </form>
+        {{ slave.pid }}
+    {% endblock %}

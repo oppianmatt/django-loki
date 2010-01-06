@@ -10,6 +10,8 @@
 
 # Django settings for loki project.
 
+import os
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -46,6 +48,8 @@ SITE_ID = 1
 # to load the internationalization machinery.
 USE_I18N = True
 
+
+STATIC_DOC_ROOT = os.path.abspath('loki/media/') + '/'
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 MEDIA_ROOT = ''
@@ -53,7 +57,7 @@ MEDIA_ROOT = ''
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = ''
+MEDIA_URL = 'media/loki/'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 

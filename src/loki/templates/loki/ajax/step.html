@@ -1,0 +1,9 @@
+<div id="step" class="drawer", style="float:left;clear:left;">
+<form id="step{{ step.id }}" name="savestep" action="javascript:savestep('step{{ step.id }}');" method="post"> 
+<b>{{ step.num }}: {{ step.type }}</b><br>
+{% for p in step.params.all %}
+    {{ p.type.name }}: {{ p.val }}<br>
+{% endfor %}
+<input type="hidden" name="step_id" value="{{ step.id }}">
+</form>
+</div>

@@ -1,0 +1,37 @@
+input {
+    font: 1em Arial, sans-serif;
+}
+td {
+    vertical-align: top;
+}
+#style_none ul li {
+    list-style-type: none;
+}
+.drawer {
+    background: #F6F6F6;
+    border: 1px solid #DCDCDC;
+    margin-bottom: 15px;
+    padding: 10px;
+}
+#drawer ul li {
+    list-style: none;
+}
+#drawer p {
+    font-weight: bold;
+}
+.drawer_title {
+    float: right;
+    margin-top: -27px;
+    margin-right: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.menu_body {
+    display:none;
+}
+.menu_head {
+    cursor: pointer;
+}
+.bold {
+    font-weight: bold;
+}

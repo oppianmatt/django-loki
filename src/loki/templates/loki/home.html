@@ -1,33 +1,4 @@
-<table border="1" cellpadding="10" cellspacing="0" height="100%" width="100%">
-<tr>
-    <td valign="top">
-        buildbots:<br>
-        <ul>
-        {% for master in bots %}
-            <li><a href="{% url loki.views.home master %}">{{ master }}</a</li>
-            <ul>
-                {% for slave in master.slaves.all %}
-                    <li><a href="{% url loki.views.home master,slave %}">{{ slave }}</a></li>
-                {% endfor %}
-            </ul><p>
-        {% endfor %}
-        </ul>
-    </td>
-    <td valign="top" width="90%">
-        {% if master %}
-            <b>{{ master }}</b> {% if master.alive %}On - <a href="/{{ master }}/?action=stop">Stop</a>{% else %}Off - <a href="/{{ master }}/?action=start">Start</a>{% endif %}<br>
-            host: {{ master.host }}<br>
-            slave/web ports: {{ master.slave_port }}/{{ master.web_port }}<br>
-            status: {{ master.status.all }}
-            <a href="http://{{ master.host }}:{{ master.web_port }}">webui</a><br>
-            {{ master.pid }}
-        {% endif %}
-        {% if slave %}
-            <b>{{ slave }}</b> {% if slave.alive %}On - <a href="/{{ slave.master }}/{{ slave }}/?action=stop">Stop</a>{% else %}Off - <a href="/{{ slave.master }}/{{ slave }}/?action=start">Start</a>{% endif %}<br>
-            host: {{ slave.host }}<br>
-            steps: {{ slave.steps.all }}
-            {{ slave.pid }}
-        {% endif %}
-    </td>
-</tr>
-</table>
+{% extends "loki/base.html" %}
+    {% block content %}
+        {{ configs }}
+    {% endblock %}

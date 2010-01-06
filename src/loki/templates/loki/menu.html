@@ -1,0 +1,8 @@
+        {% for master in bots %}
+            <h3><a href="{% url loki.views.home master %}">{{ master }}</a</h3>
+            <ul>
+                {% for slave in master.slaves.all %}
+                    <li><a href="{% url loki.views.home master,slave %}">{{ slave }}</a></li>
+                {% endfor %}
+            </ul><p>
+        {% endfor %}

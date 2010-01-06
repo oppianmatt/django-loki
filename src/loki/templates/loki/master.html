@@ -1,0 +1,12 @@
+{% extends "loki/base.html" %}
+    {% block content %}
+        {% if master %}
+            {% block title %}Master: {{ master }}{% endblock %}
+            {% if master.alive %}On - <a href="/{{ master }}/?action=stop">Stop</a>{% else %}Off - <a href="/{{ master }}/?action=start">Start</a>{% endif %}<br>
+            host: {{ master.host }}<br>
+            slave/web ports: {{ master.slave_port }}/{{ master.web_port }}<br>
+            status: {{ master.status.all }}
+            <a href="http://{{ master.host }}:{{ master.web_port }}">webui</a><br>
+            {{ master.pid }}
+        {% endif %}
+    {% endblock %}

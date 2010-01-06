@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+       <title>Loki :: Buildbot Manager</title>
+       <meta http-equiv="Content-Language" content="English" />
+       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+       <meta name="author" content="David Herreman (www.free-css-templates.com)" />
+       <meta name="Robots" content="index,follow" />
+       <link rel="stylesheet" type="text/css" href="/media/loki/css/style.css" media="screen" />
+       <link rel="stylesheet" type="text/css" href="/media/loki/css/loki.css" media="screen" />
+       <link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="rss/" />
+       <script src="/media/loki/js/jquery-1.3.1.min.js"></script>
+       <script>
+           // JavaScript
+           $(document).ready(function(){
+           {% block script %}{% endblock %}
+           });
+       </script>
+       {% block head %}{% endblock %}
+</head>
+<body>
+       
+       <div id="top" class="content">
+           <div id="icons">
+               {% comment %}
+               {% ifequal user.username "" %}<a href="{% url loki.authentication.smart_login None %}" title="Login">Login</a>
+               {% else %}{{ user.username }} :: 
+                   <a href="{% url django.contrib.auth.views.logout_then_login %}" title="Login">Logout</a>
+               {% endifequal %}<br>
+               <a href="{% url loki.views.html.home %}" title="Home page"><img src="{% loki_media %}images/home.gif" alt="Home" /></a>
+               <!--a href="{% url loki.views.html.home %}contact/" title="Contact us"><img src="{% loki_media %}images/contact.gif" alt="Contact" /></a-->
+               {% ifequal user.is_superuser 1 %}
+                   <a href="{% url admin:index %}" title="Pozer Admin"><img src="{% loki_media %}images/sitemap.gif" alt="Admin" /></a>
+               {% endifequal %}
+               {% endcomment %}
+           </div>
+           <img src="" alt="Logo" style="float:left; padding-top: 20px;">
+           <h1 style="padding-top: 20px;">{% block headtitle %}Loki :: Buildbot Manager{% endblock %}</h1>
+           <h2>Buildbot!</h2>
+       </div>
+       <!-- end of the Top part -->
+<div id="prec">
+	<div id="wrap">
+        <h2 id="alert_msg"{% if not alert_msg %} style="display: none"{% endif %}>
+        {{ alert_msg }}
+        </h2>
+{% comment %}<!--
+			<div id="pic">
+				<div id="slogan">
+					<h1>FREE TEMPLATE</h1>
+					<h2>
+					Curabitur vel risus sit amet ante porta adipiscing. Donec eget pede at libero tempor aliquet. Nulla justo. Phasellus hendrerit magna quis metus sagittis ultrices. Vestibulum in sapien. Nunc quis sem. Integer nulla neque, mollis eu, pretium eget, <a href="#" title="#">iaculis ac</a>, nibh. Vestibulum velit sapien, rhoncus vitae, ultrices a, nonummy at, neque. Nunc condimentum, nisl non rhoncus porttitor, velit enim consectetuer augue, id imperdiet mauris erat nec risus. In nec eros.
+					</h2>
+				</div>
+			</div>
+			<div id="menu">
+						<ul>	
+							<li><a href="http://www.free-css-templates.com" title="home">HOME</a></li>
+							<li><a href="#" title="Articles">ARTICLES</a></li>
+							<li><a href="#" title="Gallery">GALLERY</a></li>
+							<li><a href="#" title="Affiliates">AFFILIATES</a></li>
+							<li><a href="#" title="Articles">ARTICLES</a></li>
+							<li><a href="#" title="Abous us">ABOUTS US</a></li>
+							<li><a href="#" title="Contact">CONTACT</a></li>
+						
+						</ul>
+			</div>
+-->{% endcomment %}
+	</div>
+</div>
+
+<div class="content">
+	<div id="main">
+		<div id="right_side">
+		{% include "loki/menu.html" %}
+		</div>
+		
+		<div id="left_side">
+	        <h3>
+	        <span>{% block title %}{% endblock %}</span>
+	        </h3>
+	        <span id="drawer_title" class="drawer_title">
+	        {% block drawer_title %}{% endblock %}
+	        </span>
+	        <div class="drawer" style="display: none;">
+            {% block drawer %}{% endblock %}
+	        </div>
+            {% if long_msg %}
+	        <div id="msg">
+                {{ long_msg|safe }}
+	        </div>
+	        {% endif %}
+		    {% block content %}
+		    {% endblock %}
+		</div>
+		
+	</div>
+       <div id="footer">
+       <div class="right">&copy; Copyright 2009, <a href="http://www.redhat.com">Red Hat, Inc</a>
+                          - Design by <a href="http://www.free-css-templates.com">David Herreman</a><br />
+               <a href="http://www.python.org"><img src="/media/images/python-powered-w-70x28.png" /></a>
+               <a href="http://www.djangoproject.org"><img src="/media/images/djangojoint107x25_grey.gif" /></a>
+       </div>
+       </div>
+</div>
+
+</body>
+</html>

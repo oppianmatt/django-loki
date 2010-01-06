@@ -182,7 +182,7 @@ class Config(models.Model):
 
 class ConfigParam(models.Model):
     name = models.CharField(max_length=25)
-    type = models.ForeignKey(Config)
+    type = models.ForeignKey(Config, related_name='params')
     default = models.CharField(max_length=200, blank=True, null=True)
     required = models.BooleanField(default=False)
 
@@ -217,6 +217,7 @@ class Step(models.Model):
     type = models.ForeignKey(Config, related_name='step_type',
                              limit_choices_to={
                                  'content_type': step_content_type})
+    num = models.IntegerField()
 
     def __unicode__(self):
         return '%s :: %s' % (self.slave, self.type)
