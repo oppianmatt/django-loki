@@ -16,3 +16,15 @@ connect to http://localhost:8000/admin
 or
 4: in project dir run ./manage.py twistd
 connect to http://localhost:8001/admin
+
+5: http://localhost:8000/import/steps/
+
+6: use admin to create master and slaves
+
+7: use root of site to stop and start bots and
+   add steps to slaves
+
+NOTE: when you add steps to the slaves you have to
+go into the admin and save the master for the configs to
+be generated and written to disk. In the future this will
+be less painful.
