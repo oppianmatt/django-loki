@@ -11,7 +11,7 @@
 import time
 
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.decorators import user_passes_test
@@ -51,17 +51,32 @@ def home(request, master=None, slave=None):
     return render_to_response('loki/home.html', context)
 
 
-def config_step(request, pk):
-    config = Config.objects.get(pk=pk)
-    context = {'config': config, }
+def config_step(request, bot_id, config_id):
+    config = Config.objects.get(pk=config_id)
+    slave = Slave.objects.get(pk=bot_id)
+    step_with_max_num = Step.objects.filter(slave=slave).order_by('-num')
+    if step_with_max_num:
+        step_max_num = step_with_max_num[0].num
+    else:
+        step_max_num = 0
+    context = {'config': config,
+               'step_num': step_max_num + 1, }
+
     return render_to_response('loki/ajax/config.html', context)
 
 
+def config_step_load(request, step_id):
+    step = Step.objects.get(pk=step_id)
+    context = {'step': step, }
+
+    return render_to_response('loki/ajax/step.html', context)
+
+
 def config_step_save(request, bot_id):
+    result = ''
     if request.method == 'POST':
         try:
             slave = Slave.objects.get(id=bot_id) 
-            print request.POST
             data = request.POST.copy()
             # get a step or create a newone
             if 'step_id' in data and data['step_id']:
@@ -94,11 +109,20 @@ def config_step_save(request, bot_id):
                     params_2_add.append(param)
             step.params = params_2_add
             step.save()
+            result = step.id
         except Exception, e:
-            print e
+            result = e
 
-    context = { }
-    return render_to_response('loki/ajax/config.html', context)
+    return HttpResponse(result)
+
+
+def config_step_delete(request):
+    result = ''
+    if request.method == 'POST':
+        data = request.POST
+        step = Step.objects.get(id=data['step_id'])
+        step.delete()
+    return HttpResponse(result)
 
 
 @user_passes_test(lambda u: u.is_superuser)

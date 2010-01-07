@@ -1,9 +1,23 @@
-<div id="step" class="drawer", style="float:left;clear:left;">
-<form id="step{{ step.id }}" name="savestep" action="javascript:savestep('step{{ step.id }}');" method="post"> 
-<b>{{ step.num }}: {{ step.type }}</b><br>
-{% for p in step.params.all %}
-    {{ p.type.name }}: {{ p.val }}<br>
-{% endfor %}
-<input type="hidden" name="step_id" value="{{ step.id }}">
-</form>
+<div id="step{{ step.id }}" class="drawer" style="float:left;clear:left;">
+<div id="step_display{{ step.id }}">
+    <div style="float: left;" class="bold">{{ step.num }}: {{ step.type }}</div>
+    <div style="float: left; margin-left: 10px; margin-top: 3px;">
+        <img class="img_link" src="/admin/media/img/admin/icon_changelink.gif" onClick="javascript:togglestep('edit', {{ step.id }});">
+        <img class="img_link" src="/admin/media/img/admin/icon_deletelink.gif" onClick="javascript:togglestep('delete', {{ step.id }});">
+    </div><br>
+    {% for p in step.params.all %}
+        {{ p.type.name }}: {{ p.val }}<br>
+    {% endfor %}
+</div>
+<div id="step_edit{{ step.id }}" style="display:none;">
+    <form id="step{{ step.id }}" name="savestep" action="javascript:savestep('step{{ step.id }}');" method="post"> 
+    Edit Form Not Implimented
+    <input type="hidden" name="step_id" value="{{ step.id }}">
+    </form>
+</div>
+<div id="step_delete{{ step.id }}" style="display:none;">
+    <div style="float: left;" class="bold">{{ step.num }}: {{ step.type }}</div><br>
+    <button onClick="javascript:deletestep({{ step.id }});">Confirm Delete</button>
+    <button onClick="javascript:togglestep('display', {{ step.id }});">Cancel</button><br>
+</div>
 </div>
