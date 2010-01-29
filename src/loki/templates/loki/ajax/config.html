@@ -1,12 +1,13 @@
-<div id="step" class="drawer", style="float:left;clear:left;">
-<form id="savestep" name="savestep" action="javascript:savestep('savestep');" method="post"> 
-<b><input name="step_num" value="{{ step_num }}" maxlength="3" size="3">
+<div id="config" class="drawer", style="float:left;clear:left;">
+<form id="saveconfig" name="saveconfig" action="javascript:saveconfig('{{ type }}' , '{{ bot }}', 'saveconfig');" method="post"> 
+<b>
+{% if config_num %}<input name="config_num" value="{{ config_num }}" maxlength="3" size="3">{% endif %}
 {{ config.name }} :: {{ config.module }}</b><br>
 {% for p in config.params.all %}
 {{ p.name }}{% if p.required %}<span style="color:red;">*</span>{% endif %}: 
     <input name="{{ p.id }}"{% if p.default %}value="{{ p.default }}"{% endif %}><br>
 {% endfor %}
-<input type="hidden" name="step_type_id" value="{{ config.id }}">
+<input type="hidden" name="config_type_id" value="{{ config.id }}">
 <input type="submit" value="Add">
 </form>
 </div>

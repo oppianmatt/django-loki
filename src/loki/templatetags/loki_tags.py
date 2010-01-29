@@ -24,3 +24,7 @@ register = template.Library()
 # The first argument *must* be called "context" here.
 def step(step):
     return {'step': step, }
+
+@register.inclusion_tag('loki/ajax/status.html')
+def status(status):
+    return {'status': status, }

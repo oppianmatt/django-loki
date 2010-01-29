@@ -2,49 +2,17 @@
     {% load loki_tags %}
     {% block script %}
         $("form#addstep").submit(function() {
-            $("div#steps div#newstep").load('/ajax/config/step/add/{{ slave.id }}/' + this.step.value);
+            $("div#steps div#newstep").load('/ajax/config/step/add/{{ slave.id }}/' + this.step.value + '/');
             return false;
         });
     {% endblock %}
-    {% block head %}
-    <script>
-        function savestep(form_name) {
-            $.post('/ajax/config/step/save/{{ slave.id }}/', $("form#" + form_name).serialize(), function(data, textStatus) {
-                   if(textStatus == 'success') {
-                       $("div#steps div#newstep").empty();
-                       var new_step = $('<div/>').load('/ajax/config/step/load/' + data + '/');
-                       new_step.insertBefore($("div#steps div#newstep"));
-                   } else {
-                       alert(data);
-                   };
-            });
-        };
-        function deletestep(step_id) {
-            $.post('/ajax/config/step/delete/', { 'step_id': step_id }, function(data, textStatus) {
-                   if(textStatus == 'success') {
-                       $("div#steps div#step" + step_id).remove();
-                   } else {
-                       alert(data);
-                   };
-            });
-        };
-        function togglestep(action, id) {
-            if ($("#step_display" + id).is(":visible")) {
-                $("#step_display" + id).slideUp(500);
-            }
-            if ($("#step_edit" + id).is(":visible")) {
-                $("#step_edit" + id).slideUp(500);
-            }
-            if ($("#step_delete" + id).is(":visible")) {
-                $("#step_delete" + id).slideUp(500);
-            }
-            $("#step_" + action + id).slideDown(500);
-        };
-    </script>
+    {% block drawer_title %}
+        {% if slave.alive %}Running :: pid {{ slave.pid }} :: <a href="/{{ slave.master }}/{{ slave }}/?action=stop">Stop</a>
+        {% else %}Stopped :: <a href="/{{ slave.master }}/{{ slave }}/?action=start">Start</a>{% endif %}
     {% endblock %}
+
     {% block content %}
-        {% block title %}Slave: {{ slave }}{% endblock %}
-        <b>{{ slave }}</b> {% if slave.alive %}On - <a href="/{{ slave.master }}/{{ slave }}/?action=stop">Stop</a>{% else %}Off - <a href="/{{ slave.master }}/{{ slave }}/?action=start">Start</a>{% endif %}<br>
+        {% block title %}Slave: {{ slave }}{% endblock %}<br>
         host: {{ slave.host }}<br>
         steps:<br>
         <div id="steps" style="float: left;">
@@ -61,5 +29,4 @@
             </select>
             <input type="submit" value="Add Step">
         </form>
-        {{ slave.pid }}
     {% endblock %}

@@ -18,6 +18,10 @@ from django.contrib.auth.decorators import user_passes_test
 
 from loki.models import Master, Slave, Config, ConfigParam
 from loki.models import Status, Step, StepParam, Scheduler
+from loki.models import  status_content_type
+from loki.models import  step_content_type
+from loki.models import  scheduler_content_type
+
 from loki.model_helpers import introspect_module
 from loki.forms import ConfigParamFormSet
 
@@ -25,7 +29,8 @@ from loki.forms import ConfigParamFormSet
 def home(request, master=None, slave=None):
     context = {}
     context['bots'] = Master.objects.all()
-    context['steps'] = Config.objects.all()
+    context['steps'] = Config.objects.filter(content_type=step_content_type)
+    context['status'] = Config.objects.filter(content_type=status_content_type)
     action = None
     if request.method == 'GET' and 'action' in request.GET:
         if request.GET['action'] in ['start', 'stop', 'reconfig']:
@@ -51,48 +56,93 @@ def home(request, master=None, slave=None):
     return render_to_response('loki/home.html', context)
 
 
-def config_step(request, bot_id, config_id):
+def config_add(request, type, bot_id, config_id):
     config = Config.objects.get(pk=config_id)
-    slave = Slave.objects.get(pk=bot_id)
-    step_with_max_num = Step.objects.filter(slave=slave).order_by('-num')
-    if step_with_max_num:
-        step_max_num = step_with_max_num[0].num
-    else:
-        step_max_num = 0
-    context = {'config': config,
-               'step_num': step_max_num + 1, }
+    config_num = 0
+    if type == 'step':
+        slave = Slave.objects.get(pk=bot_id)
+        step_with_max_num = Step.objects.filter(slave=slave).order_by('-num')
+        if step_with_max_num:
+            max_num = step_with_max_num[0].num
+            config_num = max_num + 1
+    context = {'type': type,
+               'bot': bot_id,
+               'config': config,
+               'config_num': config_num, }
 
     return render_to_response('loki/ajax/config.html', context)
 
 
-def config_step_load(request, step_id):
-    step = Step.objects.get(pk=step_id)
-    context = {'step': step, }
+def config_load(request, type, config_id):
+    if type == 'step':
+        config = Step.objects.get(pk=config_id)
+    elif type == 'status':
+        config = Status.objects.get(pk=config_id)
+    context = {type: config, }
 
-    return render_to_response('loki/ajax/step.html', context)
+    return render_to_response('loki/ajax/%s.html' % type, context)
 
 
 def config_step_save(request, bot_id):
     result = ''
     if request.method == 'POST':
+        slave = Slave.objects.get(id=bot_id) 
+        data = request.POST.copy()
+        # get a step or create a newone
+        if 'step_id' in data and data['step_id']:
+            step = Step.objects.get(id=data['step_id'])
+            step.num = data['config_num']
+            del data['step_id']
+        else:
+            config = Config.objects.get(id=data['config_type_id'])
+            step = Step(slave=slave, type=config, num=data['config_num'])
+            step.save()
+            del data['config_type_id']
+        del data['config_num']
+
+        params_2_add = []
+        # update existing params
+        for p in step.params.all():
+            #TODO: update existing params
+            #      only to creating a new one
+            #      so just passing for now
+            # how: check if default, if changed, save it
+            #      then delete the key from the dict
+            #      so it's not reprocessed
+            #      and add the param to the params 2 add
+            pass
+        # add new params
+        for p, v in data.items():
+            param_type = ConfigParam.objects.get(id=p)
+            if v != param_type.default:
+                param = StepParam(step=step, type=param_type, val=v)
+                params_2_add.append(param)
+        step.params = params_2_add
+        step.save()
+        result = step.id
+    return HttpResponse(result)
+
+
+def config_status_save(request, bot_id):
+    result = ''
+    if request.method == 'POST':
         try:
-            slave = Slave.objects.get(id=bot_id) 
+            master = Master.objects.get(id=bot_id) 
             data = request.POST.copy()
-            # get a step or create a newone
-            if 'step_id' in data and data['step_id']:
-                step = Step.objects.get(id=data['step_id'])
-                step.num = data['step_num']
-                del data['step_id']
+            # get a status or create a newone
+            if 'status_id' in data and data['status_id']:
+                status = Status.objects.get(id=data['status_id'])
+                del data['status_id']
             else:
-                config = Config.objects.get(id=data['step_type_id'])
-                step = Step(slave=slave, type=config, num=data['step_num'])
-                step.save()
-                del data['step_type_id']
-            del data['step_num']
+                config = Config.objects.get(id=data['config_type_id'])
+                status = Status(slave=slave, type=config)
+                status.save()
+                del data['config_type_id']
+            del data['status_num']
 
             params_2_add = []
             # update existing params
-            for p in step.params.all():
+            for p in status.params.all():
                 #TODO: update existing params
                 #      only to creating a new one
                 #      so just passing for now
@@ -105,23 +155,26 @@ def config_step_save(request, bot_id):
             for p, v in data.items():
                 param_type = ConfigParam.objects.get(id=p)
                 if v != param_type.default:
-                    param = StepParam(step=step, type=param_type, val=v)
+                    param = StatusParam(status=status, type=param_type, val=v)
                     params_2_add.append(param)
-            step.params = params_2_add
-            step.save()
-            result = step.id
+            status.params = params_2_add
+            status.save()
+            result = status.id
         except Exception, e:
             result = e
 
     return HttpResponse(result)
 
 
-def config_step_delete(request):
+def config_delete(request, type):
     result = ''
     if request.method == 'POST':
         data = request.POST
-        step = Step.objects.get(id=data['step_id'])
-        step.delete()
+        if type == 'step':
+            config = Step.objects.get(id=data['step_id'])
+        elif type == 'status':
+            config = Status.objects.get(id=data['status_id'])
+        config.delete()
     return HttpResponse(result)
 
 
@@ -130,9 +183,9 @@ def introspect(request, type):
     # do import if we're importing
     if request.method == 'POST' and 'import' in request.POST:
         content_types = {
-            'status': ContentType.objects.get_for_model(Status),
-            'steps': ContentType.objects.get_for_model(Step),
-            'scheduler': ContentType.objects.get_for_model(Scheduler),
+            'status': status_content_type,
+            'steps': step_content_type,
+            'scheduler': scheduler_content_type,
         }
         module = request.POST['import']
         path = '.'.join(module.split('.')[:-1])
