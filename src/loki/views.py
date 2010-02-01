@@ -60,11 +60,11 @@ def config_add(request, type, bot_id, config_id):
     config = Config.objects.get(pk=config_id)
     config_num = 0
     if type == 'step':
+        config_num = 1
         slave = Slave.objects.get(pk=bot_id)
         step_with_max_num = Step.objects.filter(slave=slave).order_by('-num')
         if step_with_max_num:
-            max_num = step_with_max_num[0].num
-            config_num = max_num + 1
+            config_num = step_with_max_num[0].num + 1
     context = {'type': type,
                'bot': bot_id,
                'config': config,
