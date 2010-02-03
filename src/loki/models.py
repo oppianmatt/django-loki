@@ -16,13 +16,13 @@ from django.db.models.signals import post_delete
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 
-from loki import build_bot_run
 from loki.settings import *
 from loki.bind_administration import bind_administration
 from loki.signal_receivers import post_save_bot
 from loki.signal_receivers import post_delete_bot
 from loki.model_helpers import _template
 from loki.model_helpers import _generate_class
+from loki.model_helpers import build_bot_run
 
 # these are for filters later
 # need to try catch them because syncdb

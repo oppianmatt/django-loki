@@ -10,9 +10,9 @@
 
 import os
 
-from loki import build_bot_run
 from loki.settings import *
 from loki.helpers import generate_master_cfg
+from loki.model_helpers import build_bot_run
 from buildbot.scripts.runner import Options, createMaster
 
 
