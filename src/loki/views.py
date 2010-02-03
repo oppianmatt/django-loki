@@ -179,7 +179,7 @@ def config_delete(request, type):
 
 
 @user_passes_test(lambda u: u.is_superuser)
-def introspect(request, type):
+def import_config(request, type):
     # do import if we're importing
     if request.method == 'POST' and 'import' in request.POST:
         content_types = {
@@ -206,8 +206,12 @@ def introspect(request, type):
             new_config.delete()
             raise e
 
-        return HttpResponseRedirect(reverse('loki.views.introspect',
-                                    args=[type]))
+        if 'path' in request.POST:
+            path = request.POST['path']
+        else:
+            path = None
+        return HttpResponseRedirect('%s?path=%s' % (reverse('loki.views.import_config',
+                                    args=[type]), path))
 
     # not importing so get configs in the db and configs from the path
     configs = [mod[0] for mod in Config.objects.values_list('module')]
@@ -216,7 +220,7 @@ def introspect(request, type):
         path = request.GET['path']
     introspected = introspect_module(path=path)
 
-    # calculate which introspected cofigs are already in the db
+    # calculate which introspected configs are already in the db
     del_classes = []
     for config in introspected:
         if introspected[config][0] in configs:
@@ -230,4 +234,4 @@ def introspect(request, type):
     context = {'path': path,
                 'type': type,
                 'classes': introspected, }
-    return render_to_response('loki/introspect.html', context)
+    return render_to_response('loki/import.html', context)

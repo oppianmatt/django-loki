@@ -1,9 +1,9 @@
-<form action="{% url loki.views.introspect type %}">
-introspect: <input type="text" name="path" value="{{ path }}">
+<form action="{% url loki.views.import_config type %}">
+import: <input type="text" name="path" value="{{ path }}">
 <input name="submit" type="submit" value="Go">
 </form><hr>
 {% for name,details in classes.items %}
-    <form method="post" action="{% url loki.views.introspect type %}">
+    <form method="post" action="{% url loki.views.import_config type %}">
     {{ name }} :: {{ details.0 }}<br>
     <input type="hidden" name="import" value="{{ details.0 }}">
     <table>
@@ -17,6 +17,8 @@ introspect: <input type="text" name="path" value="{{ path }}">
         <td>{{ opt }}</td><td>&nbsp;</td><td>{{ def }}</td>
     </tr>
     {% endfor %}
-    </table><input name="submit" type="submit" value="import"></form><hr>
+    </table>
+    <input type="hidden" name="path" value="{{ path }}">
+    <input name="submit" type="submit" value="import"></form><hr>
 
 {% endfor %}
