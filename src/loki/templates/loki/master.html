@@ -6,42 +6,6 @@
             return false;
         });
     {% endblock %}
-    {% block head %}
-    <script>
-        function savestatus(form_name) {
-            $.post('/ajax/config/status/save/{{ master.id }}/', $("form#" + form_name).serialize(), function(data, textStatus) {
-                   if(textStatus == 'success') {
-                       $("div#statuss div#newstatus").empty();
-                       var new_status = $('<div/>').load('/ajax/config/status/load/' + data + '/');
-                       new_status.insertBefore($("div#statuss div#newstatus"));
-                   } else {
-                       alert(data);
-                   };
-            });
-        };
-        function deletestatus(status_id) {
-            $.post('/ajax/config/status/delete/', { 'status_id': status_id }, function(data, textStatus) {
-                   if(textStatus == 'success') {
-                       $("div#statuss div#status" + status_id).remove();
-                   } else {
-                       alert(data);
-                   };
-            });
-        };
-        function togglestatus(action, id) {
-            if ($("#status_display" + id).is(":visible")) {
-                $("#status_display" + id).slideUp(500);
-            }
-            if ($("#status_edit" + id).is(":visible")) {
-                $("#status_edit" + id).slideUp(500);
-            }
-            if ($("#status_delete" + id).is(":visible")) {
-                $("#status_delete" + id).slideUp(500);
-            }
-            $("#status_" + action + id).slideDown(500);
-        };
-    </script>
-    {% endblock %}
     {% block drawer_title %}
         {% if master.alive %}Running :: pid {{ master.pid }} :: <a href="/{{ master }}/?action=stop">Stop</a>
         {% else %}Stopped :: <a href="/{{ master }}/?action=start">Start</a>{% endif %}
@@ -50,7 +14,7 @@
         {% block title %}Master: {{ master }}{% endblock %}<br>
         host: {{ master.host }} <a href="http://{{ master.host }}:{{ master.web_port }}">webui</a><br>
         slave/web ports: {{ master.slave_port }}/{{ master.web_port }}<br>
-        status:
+        status:<br>
         <div id="statuss" style="float: left;">
         {% for s in master.status.all %}
         {% status s %}

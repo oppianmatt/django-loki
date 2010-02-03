@@ -114,10 +114,10 @@ class Master(Bot):
             builders.append('b%s' % ct)
             ct += 1
 
-        #generate statuses
-        #for status in self.statuses:
-        #    statuses += "c['status'].append(%s)" % _generate_class(status)
-        #    modules.append(status.module)
+        #generate status
+        for status in self.status.all():
+            statuses += "c['status'].append(%s)" % _generate_class(status)
+            modules.append(status.type)
 
         #restructure the imports
         for x in modules:
@@ -218,6 +218,9 @@ class Step(models.Model):
                              limit_choices_to={
                                  'content_type': step_content_type})
     num = models.IntegerField()
+
+    class Meta:
+        ordering = ('num', )
 
     def __unicode__(self):
         return '%s :: %s' % (self.slave, self.type)

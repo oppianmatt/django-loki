@@ -17,10 +17,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.decorators import user_passes_test
 
 from loki.models import Master, Slave, Config, ConfigParam
-from loki.models import Status, Step, StepParam, Scheduler
-from loki.models import  status_content_type
-from loki.models import  step_content_type
-from loki.models import  scheduler_content_type
+from loki.models import Status, StatusParam
+from loki.models import Step, StepParam, Scheduler
+from loki.models import status_content_type
+from loki.models import step_content_type
+from loki.models import scheduler_content_type
 
 from loki.model_helpers import introspect_module
 from loki.forms import ConfigParamFormSet
@@ -89,10 +90,10 @@ def config_step_save(request, bot_id):
         slave = Slave.objects.get(id=bot_id) 
         data = request.POST.copy()
         # get a step or create a newone
-        if 'step_id' in data and data['step_id']:
-            step = Step.objects.get(id=data['step_id'])
+        if 'configid' in data and data['configid']:
+            step = Step.objects.get(id=data['configid'])
             step.num = data['config_num']
-            del data['step_id']
+            del data['configid']
         else:
             config = Config.objects.get(id=data['config_type_id'])
             step = Step(slave=slave, type=config, num=data['config_num'])
@@ -126,42 +127,38 @@ def config_step_save(request, bot_id):
 def config_status_save(request, bot_id):
     result = ''
     if request.method == 'POST':
-        try:
-            master = Master.objects.get(id=bot_id) 
-            data = request.POST.copy()
-            # get a status or create a newone
-            if 'status_id' in data and data['status_id']:
-                status = Status.objects.get(id=data['status_id'])
-                del data['status_id']
-            else:
-                config = Config.objects.get(id=data['config_type_id'])
-                status = Status(slave=slave, type=config)
-                status.save()
-                del data['config_type_id']
-            del data['status_num']
-
-            params_2_add = []
-            # update existing params
-            for p in status.params.all():
-                #TODO: update existing params
-                #      only to creating a new one
-                #      so just passing for now
-                # how: check if default, if changed, save it
-                #      then delete the key from the dict
-                #      so it's not reprocessed
-                #      and add the param to the params 2 add
-                pass
-            # add new params
-            for p, v in data.items():
-                param_type = ConfigParam.objects.get(id=p)
-                if v != param_type.default:
-                    param = StatusParam(status=status, type=param_type, val=v)
-                    params_2_add.append(param)
-            status.params = params_2_add
+        master = Master.objects.get(id=bot_id) 
+        data = request.POST.copy()
+        # get a status or create a newone
+        if 'configid' in data and data['configid']:
+            status = Status.objects.get(id=data['configid'])
+            del data['configid']
+        else:
+            config = Config.objects.get(id=data['config_type_id'])
+            status = Status(master=master, type=config)
             status.save()
-            result = status.id
-        except Exception, e:
-            result = e
+            del data['config_type_id']
+
+        params_2_add = []
+        # update existing params
+        for p in status.params.all():
+            #TODO: update existing params
+            #      only to creating a new one
+            #      so just passing for now
+            # how: check if default, if changed, save it
+            #      then delete the key from the dict
+            #      so it's not reprocessed
+            #      and add the param to the params 2 add
+            pass
+        # add new params
+        for p, v in data.items():
+            param_type = ConfigParam.objects.get(id=p)
+            if v != param_type.default:
+                param = StatusParam(status=status, type=param_type, val=v)
+                params_2_add.append(param)
+        status.params = params_2_add
+        status.save()
+        result = status.id
 
     return HttpResponse(result)
 
@@ -171,9 +168,9 @@ def config_delete(request, type):
     if request.method == 'POST':
         data = request.POST
         if type == 'step':
-            config = Step.objects.get(id=data['step_id'])
+            config = Step.objects.get(id=data['configid'])
         elif type == 'status':
-            config = Status.objects.get(id=data['status_id'])
+            config = Status.objects.get(id=data['configid'])
         config.delete()
     return HttpResponse(result)
 

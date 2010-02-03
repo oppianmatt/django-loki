@@ -9,10 +9,11 @@ function saveconfig(type, bot, form_name) {
 	   };
     });
 };
-function deleteconfig(type, step_id) {
-    $.post('/ajax/config/' + type + '/delete/', { 'step_id': step_id }, function(data, textStatus) {
+function deleteconfig(type, id) {
+    var id_name = type + '_id';
+    $.post('/ajax/config/' + type + '/delete/', { configid: id }, function(data, textStatus) {
 	   if(textStatus == 'success') {
-	       $("div#" + type + "s div#" + type + step_id).remove();
+	       $("div#" + type + "s div#" + type + id).remove();
 	   } else {
 	       alert(data);
 	   };
