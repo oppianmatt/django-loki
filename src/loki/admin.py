@@ -1,4 +1,4 @@
-# Copyright 2008, Red Hat, Inc
+# Copyright 2008-2010, Red Hat, Inc
 # Dan Radez <dradez@redhat.com>
 #
 # This software may be freely redistributed under the terms of the GNU

@@ -110,7 +110,7 @@ c['builders'] = [%(builders)s]
 c['status'] = []
 
 from buildbot.status import html
-c['status'].append(html.WebStatus(http_port=%(webport)s))
+c['status'].append(html.WebStatus(http_port=%(webport)s, allowForce=True))
 
 # from buildbot.status import mail
 # c['status'].append(mail.MailNotifier(fromaddr="buildbot@localhost",

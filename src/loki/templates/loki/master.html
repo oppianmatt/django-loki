@@ -7,7 +7,8 @@
         });
     {% endblock %}
     {% block drawer_title %}
-        {% if master.alive %}Running :: pid {{ master.pid }} :: <a href="/{{ master }}/?action=stop">Stop</a>
+        {% if master.alive %}Running <a href="/{{ master }}/?action=reconfig">reconfig/hup</a>
+            :: pid {{ master.pid }} :: <a href="/{{ master }}/?action=stop">Stop</a>
         {% else %}Stopped :: <a href="/{{ master }}/?action=start">Start</a>{% endif %}
     {% endblock %}
     {% block content %}
