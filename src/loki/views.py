@@ -27,14 +27,13 @@ from loki.model_helpers import introspect_module
 from loki.forms import ConfigParamFormSet
 
 
-@user_passes_test(lambda u: u.is_superuser)
 def home(request, master=None, slave=None):
     context = {}
     context['bots'] = Master.objects.all()
     context['steps'] = Config.objects.filter(content_type=step_content_type)
     context['status'] = Config.objects.filter(content_type=status_content_type)
     action = None
-    if request.method == 'GET' and 'action' in request.GET:
+    if request.method == 'GET' and 'action' in request.GET and request.user.is_superuser:
         if request.GET['action'] in ['start', 'stop', 'reconfig']:
             action = request.GET['action']
     if slave:
