@@ -27,6 +27,7 @@ from loki.model_helpers import introspect_module
 from loki.forms import ConfigParamFormSet
 
 
+@user_passes_test(lambda u: u.is_superuser)
 def home(request, master=None, slave=None):
     context = {}
     context['bots'] = Master.objects.all()
@@ -57,6 +58,7 @@ def home(request, master=None, slave=None):
     return render_to_response('loki/home.html', context)
 
 
+@user_passes_test(lambda u: u.is_superuser)
 def config_add(request, type, bot_id, config_id):
     config = Config.objects.get(pk=config_id)
     config_num = 0
@@ -74,6 +76,7 @@ def config_add(request, type, bot_id, config_id):
     return render_to_response('loki/ajax/config.html', context)
 
 
+@user_passes_test(lambda u: u.is_superuser)
 def config_load(request, type, config_id):
     if type == 'step':
         config = Step.objects.get(pk=config_id)
@@ -84,6 +87,7 @@ def config_load(request, type, config_id):
     return render_to_response('loki/ajax/%s.html' % type, context)
 
 
+@user_passes_test(lambda u: u.is_superuser)
 def config_step_save(request, bot_id):
     result = ''
     if request.method == 'POST':
@@ -124,6 +128,7 @@ def config_step_save(request, bot_id):
     return HttpResponse(result)
 
 
+@user_passes_test(lambda u: u.is_superuser)
 def config_status_save(request, bot_id):
     result = ''
     if request.method == 'POST':
@@ -163,6 +168,7 @@ def config_status_save(request, bot_id):
     return HttpResponse(result)
 
 
+@user_passes_test(lambda u: u.is_superuser)
 def config_delete(request, type):
     result = ''
     if request.method == 'POST':
