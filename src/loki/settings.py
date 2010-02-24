@@ -9,10 +9,14 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 import os
+import loki
+
 from django.conf import settings
 
+BUILDBOT_TMPLS = str(loki).split()[3][1:-14]
 BUILDBOT_BASE = getattr(settings, 'BUILDBOT_BASE', 'buildbots')
 BUILDBOT_MASTERS = getattr(settings, 'BUILDBOT_MASTERS',
                              os.path.join(BUILDBOT_BASE, 'masters'))
 BUILDBOT_SLAVES = getattr(settings, 'BUILDBOT_SLAVES',
                              os.path.join(BUILDBOT_BASE, 'slaves'))
+print BUILDBOT_TMPLS

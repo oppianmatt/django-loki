@@ -126,7 +126,7 @@ class Master(Bot):
                          x.module.split('.')[-1])
 
         #generate the template
-        t = _template('loki/master.cfg.tpl',
+        t = _template('%smaster.cfg.tpl' % BUILDBOT_TMPLS,
                 botname=self.name,
                 webhost=self.host,
                 webport=self.web_port,
@@ -157,7 +157,7 @@ class Slave(Bot):
         return self.name
 
     def generate_cfg(self):
-        t = _template('loki/slave.cfg.tpl',
+        t = _template('%sslave.cfg.tpl' % BUILDBOT_TMPLS,
                 basedir=os.path.abspath(self.path),
                 masterhost=self.master.host,
                 slavename=self.name,
