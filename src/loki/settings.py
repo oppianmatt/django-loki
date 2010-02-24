@@ -19,4 +19,3 @@ BUILDBOT_MASTERS = getattr(settings, 'BUILDBOT_MASTERS',
                              os.path.join(BUILDBOT_BASE, 'masters'))
 BUILDBOT_SLAVES = getattr(settings, 'BUILDBOT_SLAVES',
                              os.path.join(BUILDBOT_BASE, 'slaves'))
-print BUILDBOT_TMPLS
