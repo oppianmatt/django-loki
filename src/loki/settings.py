@@ -14,6 +14,8 @@ import loki
 from django.conf import settings
 
 BUILDBOT_TMPLS = str(loki).split()[3][1:-14]
+if BUILDBOT_TMPLS[-1] != '/':
+    BUILDBOT_TMPLS = '%s/' % BUILDBOT_TMPLS
 BUILDBOT_BASE = getattr(settings, 'BUILDBOT_BASE', 'buildbots')
 BUILDBOT_MASTERS = getattr(settings, 'BUILDBOT_MASTERS',
                              os.path.join(BUILDBOT_BASE, 'masters'))

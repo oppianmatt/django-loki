@@ -9,5 +9,5 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 __author__ = 'Dan Radez'
-__version__ = '0.7.0'
+__version__ = '0.7.1'
 __license__ = 'GPLv3'

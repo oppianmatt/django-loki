@@ -60,3 +60,24 @@ def post_delete_bot(sender, instance, **kwargs):
     if os.path.isdir(instance.path):
         import shutil
         shutil.rmtree(instance.path)
+
+def post_save_config(sender, instance, **kwargs):
+    """
+    post save call back
+
+    :Parameters:
+       - sender: the sending object.
+       - instance: instance of the object being saved
+       - created: if a new record was created
+       - kwargs: any keyword arguments
+    """
+    # find the master
+    if hasattr(instance, 'master'):
+        master = instance.master
+    else:
+        master = instance.slave.master
+
+    # regen and hup
+    master.generate_cfg()
+    if master.alive:
+        build_bot_run(['sighup', master.path])
