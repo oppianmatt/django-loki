@@ -44,6 +44,7 @@ class SlaveAdmin(admin.ModelAdmin):
 
 class ConfigAdmin(admin.ModelAdmin):
     inlines = [ConfigParamInline, ]
+    list_display = ('name', 'content_type')
 
 
 class StatusAdmin(admin.ModelAdmin):

@@ -11,7 +11,8 @@
 </div>
 <div id="status_edit{{ status.id }}" style="display:none;">
     <form id="status{{ status.id }}" name="savestatus" action="javascript:savestatus('status{{ status.id }}');" method="post"> 
-    Edit Form Not Implimented
+    Edit Form Not Implimented<br>
+    <button onClick="javascript:toggleconfig('status', 'display', {{ status.id }});">Cancel</button><br>
     <input type="hidden" name="status_id" value="{{ status.id }}">
     </form>
 </div>

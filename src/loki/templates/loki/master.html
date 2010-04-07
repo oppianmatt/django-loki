@@ -5,6 +5,10 @@
             $("div#statuss div#newstatus").load('/ajax/config/status/add/{{ master.id }}/' + this.status.value + '/');
             return false;
         });
+        $("form#addscheduler").submit(function() {
+            $("div#schedulers div#newscheduler").load('/ajax/config/scheduler/add/{{ master.id }}/' + this.scheduler.value + '/');
+            return false;
+        });
     {% endblock %}
     {% block drawer_title %}
         {% if master.alive %}Running <a href="/{{ master }}/?action=reconfig">reconfig/hup</a>
@@ -30,5 +34,18 @@
             </select>
             <input type="submit" value="Add Status">
         </form>
-
+        <div id="schedulers" style="float: left;">
+        {% for s in master.schedulers.all %}
+        {% scheduler s %}
+        {% endfor %}
+        <div id="newscheduler" style="float: left; clear: left;"/>
+        </div><br>
+        <form id="addscheduler" name="addscheduler" action="javascript:;" style="clear:left;">
+            <select id="scheduler" name="scheduler">
+            {% for s in scheduler %}
+                <option value="{{ s.pk }}">{{ s.name }} :: {{ s.module }}</option>
+            {% endfor %}
+            </select>
+            <input type="submit" value="Add Status">
+        </form>
     {% endblock %}

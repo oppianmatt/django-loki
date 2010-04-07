@@ -120,6 +120,11 @@ class Master(Bot):
             statuses += "c['status'].append(%s)" % _generate_class(status)
             modules.append(status.type)
 
+        #generate schedulers
+        for scheduler in self.schedulers.all():
+            schedulers += "c['scheduler'].append(%s)" % _generate_class(scheduler)
+            modules.append(scheduler.type)
+
         #restructure the imports
         for x in modules:
             imports += 'from %s import %s\n' % (
@@ -237,7 +242,7 @@ class StepParam(models.Model):
 
 
 class Scheduler(models.Model):
-    slave = models.ForeignKey(Slave, related_name='schedulers')
+    master = models.ForeignKey(Master, related_name='schedulers')
     type = models.ForeignKey(Config, related_name='scheduler_type',
                              limit_choices_to={
                                  'content_type': scheduler_content_type})
@@ -261,3 +266,4 @@ post_save.connect(post_save_bot, sender=Slave)
 post_delete.connect(post_delete_bot, sender=Slave)
 post_save.connect(post_save_config, sender=Step)
 post_save.connect(post_save_config, sender=Status)
+post_save.connect(post_save_config, sender=Scheduler)

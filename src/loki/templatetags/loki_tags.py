@@ -29,3 +29,8 @@ def step(step):
 @register.inclusion_tag('loki/ajax/status.html')
 def status(status):
     return {'status': status, }
+
+
+@register.inclusion_tag('loki/ajax/scheduler.html')
+def scheduler(scheduler):
+    return {'scheduler': scheduler, }

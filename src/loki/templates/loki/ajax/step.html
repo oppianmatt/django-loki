@@ -11,7 +11,8 @@
 </div>
 <div id="step_edit{{ step.id }}" style="display:none;">
     <form id="step{{ step.id }}" name="savestep" action="javascript:saveconfig('step{{ step.id }}');" method="post"> 
-    Edit Form Not Implimented
+    Edit Form Not Implimented<br>
+    <button onClick="javascript:toggleconfig('step', 'display', {{ step.id }});">Cancel</button><br>
     <input type="hidden" name="step_id" value="{{ step.id }}">
     </form>
 </div>
