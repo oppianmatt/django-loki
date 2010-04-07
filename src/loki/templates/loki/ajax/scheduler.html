@@ -1,0 +1,24 @@
+<div id="scheduler{{ scheduler.id }}" class="drawer" style="float:left;clear:left;">
+<div id="scheduler_display{{ scheduler.id }}">
+    <div style="float: left;" class="bold">{{ scheduler.type }}</div>
+    <div style="float: left; margin-left: 10px; margin-top: 3px;">
+        <img class="img_link" src="/admin/media/img/admin/icon_changelink.gif" onClick="javascript:toggleconfig('scheduler', 'edit', {{ scheduler.id }});">
+        <img class="img_link" src="/admin/media/img/admin/icon_deletelink.gif" onClick="javascript:toggleconfig('scheduler', 'delete', {{ scheduler.id }});">
+    </div><br>
+    {% for p in scheduler.params.all %}
+        {{ p.type.name }}: {{ p.val }}<br>
+    {% endfor %}
+</div>
+<div id="scheduler_edit{{ scheduler.id }}" style="display:none;">
+    <form id="scheduler{{ scheduler.id }}" name="savescheduler" action="javascript:savescheduler('scheduler{{ scheduler.id }}');" method="post"> 
+    Edit Form Not Implimented<br>
+    <button onClick="javascript:toggleconfig('scheduler', 'display', {{ scheduler.id }});">Cancel</button><br>
+    <input type="hidden" name="scheduler_id" value="{{ scheduler.id }}">
+    </form>
+</div>
+<div id="scheduler_delete{{ scheduler.id }}" style="display:none;">
+    <div style="float: left;" class="bold">{{ scheduler.num }}: {{ scheduler.type }}</div><br>
+    <button onClick="javascript:deleteconfig('scheduler', {{ scheduler.id }});">Confirm Delete</button>
+    <button onClick="javascript:toggleconfig('scheduler', 'display', {{ scheduler.id }});">Cancel</button><br>
+</div>
+</div>
