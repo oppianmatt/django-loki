@@ -61,6 +61,7 @@ def post_delete_bot(sender, instance, **kwargs):
         import shutil
         shutil.rmtree(instance.path)
 
+
 def post_save_config(sender, instance, **kwargs):
     """
     post save call back

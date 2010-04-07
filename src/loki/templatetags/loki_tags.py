@@ -25,6 +25,7 @@ register = template.Library()
 def step(step):
     return {'step': step, }
 
+
 @register.inclusion_tag('loki/ajax/status.html')
 def status(status):
     return {'status': status, }

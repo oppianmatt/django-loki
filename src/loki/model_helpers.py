@@ -172,7 +172,7 @@ def build_bot_run(options):
         else:
             print 'waiting'
             os.waitpid(child_pid, 0)
-                
+
     elif command == "stop":
         stop(so, wait=True)
     elif command == "restart":

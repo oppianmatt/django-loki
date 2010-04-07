@@ -33,7 +33,8 @@ def home(request, master=None, slave=None):
     context['steps'] = Config.objects.filter(content_type=step_content_type)
     context['status'] = Config.objects.filter(content_type=status_content_type)
     action = None
-    if request.method == 'GET' and 'action' in request.GET and request.user.is_superuser:
+    if request.method == 'GET' and 'action' in request.GET \
+            and request.user.is_superuser:
         if request.GET['action'] in ['start', 'stop', 'reconfig']:
             action = request.GET['action']
     if slave:
@@ -90,7 +91,7 @@ def config_load(request, type, config_id):
 def config_step_save(request, bot_id):
     result = ''
     if request.method == 'POST':
-        slave = Slave.objects.get(id=bot_id) 
+        slave = Slave.objects.get(id=bot_id)
         data = request.POST.copy()
         # get a step or create a newone
         if 'configid' in data and data['configid']:
@@ -131,7 +132,7 @@ def config_step_save(request, bot_id):
 def config_status_save(request, bot_id):
     result = ''
     if request.method == 'POST':
-        master = Master.objects.get(id=bot_id) 
+        master = Master.objects.get(id=bot_id)
         data = request.POST.copy()
         # get a status or create a newone
         if 'configid' in data and data['configid']:
@@ -212,8 +213,8 @@ def import_config(request, type):
             path = request.POST['path']
         else:
             path = None
-        return HttpResponseRedirect('%s?path=%s' % (reverse('loki.views.import_config',
-                                    args=[type]), path))
+        return HttpResponseRedirect('%s?path=%s' % (
+            reverse('loki.views.import_config', args=[type]), path))
 
     # not importing so get configs in the db and configs from the path
     configs = [mod[0] for mod in Config.objects.values_list('module')]
