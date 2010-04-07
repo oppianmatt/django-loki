@@ -83,7 +83,8 @@ def introspect_module(path='buildbot.steps'):
         for i in inspect.getmembers(y):
             if inspect.isclass(i[1]) and not i[0].startswith('_')\
                and i[1].__module__.startswith("%s.%s" % (path, m))\
-               and hasattr(i[1], '__init__'):
+               and (hasattr(i[1], '__init__') and \
+                   'method' in str(type(i[1].__init__))):
                 req = []
                 opt = {}
                 i_init = inspect.getargspec(i[1].__init__)
