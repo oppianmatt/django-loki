@@ -38,7 +38,8 @@ class MasterAdmin(admin.ModelAdmin):
 
 
 class SlaveAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('master', 'name')
+    list_display_links = ('name')
 
 
 class ConfigAdmin(admin.ModelAdmin):
