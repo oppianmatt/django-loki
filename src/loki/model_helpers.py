@@ -189,6 +189,8 @@ def build_bot_run(options):
             stop(so, wait=True)
         except BuildbotNotRunningError:
             pass
+        except OSError:
+            pass
     elif command == "restart":
         restart(so)
     elif command == "reconfig" or command == "sighup":
