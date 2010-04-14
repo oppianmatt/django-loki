@@ -163,6 +163,15 @@ def build_bot_run(options):
                     # ERROR, fd wasn't open to begin with (ignored)
                         pass
 
+                try:
+                    # try and rename myself to buildbot
+                    import dl
+                    libc = dl.open('/lib/libc.so.6')
+                    libc.call('prctl', 15, 'buildbot', 0, 0, 0)
+                except:
+                    # pass for now, this is kinda experimental
+                    pass
+
                 # finally execute the buildbot start script
                 from buildbot.scripts.startup import start
                 start(so)

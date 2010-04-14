@@ -2,8 +2,8 @@
 <div id="step_display{{ step.id }}">
     <div style="float: left;" class="bold">{{ step.num }}: {{ step.type }}</div>
     <div style="float: left; margin-left: 10px; margin-top: 3px;">
-        <img class="img_link" src="/admin/media/img/admin/icon_changelink.gif" onClick="javascript:toggleconfig('step', 'edit', {{ step.id }});">
-        <img class="img_link" src="/admin/media/img/admin/icon_deletelink.gif" onClick="javascript:toggleconfig('step', 'delete', {{ step.id }});">
+        <img class="img_link" src="/media/admin/img/admin/icon_changelink.gif" onClick="javascript:toggleconfig('step', 'edit', {{ step.id }});">
+        <img class="img_link" src="/media/admin/img/admin/icon_deletelink.gif" onClick="javascript:toggleconfig('step', 'delete', {{ step.id }});">
     </div><br>
     {% for p in step.params.all %}
         {{ p.type.name }}: {{ p.val }}<br>

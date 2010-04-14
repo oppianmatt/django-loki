@@ -1,4 +1,24 @@
 {% extends "loki/base.html" %}
+    {% block title %}
+    Home
+    {% endblock %}
     {% block content %}
-        {{ configs }}
+        {% ifequal user.is_superuser 1 %}
+        <div style="float:left;padding-right:50px;">
+        <ul>All Masters
+        <li><a href="{% url loki.views.home 'all' %}?action=start">Start</a></li>
+        <li><a href="{% url loki.views.home 'all' %}?action=stop">Stop</a></li>
+        <li><a href="{% url loki.views.home 'all' %}?action=restart">Restart</a></li>
+        <li><a href="{% url loki.views.home 'all' %}?action=hup">Hup</a></li>
+        </ul>
+        </div>
+        <div style="float:left;">
+        <ul>All Slaves
+        <li><a href="{% url loki.views.home 'all','all' %}?action=start">Start</a></li>
+        <li><a href="{% url loki.views.home 'all','all' %}?action=stop">Stop</a></li>
+        <li><a href="{% url loki.views.home 'all','all' %}?action=restart">Restart</a></li>
+        <li><a href="{% url loki.views.home 'all','all' %}?action=hup">Hup</a></li>
+        </ul>
+        </div>
+        {% endifequal %}
     {% endblock %}

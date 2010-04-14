@@ -1,8 +1,10 @@
         {% for master in bots %}
-            <h3><a href="{% url loki.views.home master %}">{{ master }}</a</h3>
+            <h3><a href="{% url loki.views.home master %}">{{ master }}</a>
+                <span id="{% if master.alive %}running{% else %}stopped{% endif %}">&bull;</span></h3>
             <ul>
                 {% for slave in master.slaves.all %}
-                    <li><a href="{% url loki.views.home master,slave %}">{{ slave }}</a></li>
+                    <li><a href="{% url loki.views.home master,slave %}">{{ slave }}</a>
+                        <span id="{% if slave.alive %}running{% else %}stopped{% endif %}">&bull;</span></li>
                 {% endfor %}
             </ul><p>
         {% endfor %}

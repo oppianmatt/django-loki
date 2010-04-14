@@ -23,11 +23,11 @@
        
        <div id="top" class="content">
            <div id="icons">
-               {% comment %}
                {% ifequal user.username "" %}<a href="{% url loki.authentication.smart_login None %}" title="Login">Login</a>
                {% else %}{{ user.username }} :: 
                    <a href="{% url django.contrib.auth.views.logout_then_login %}" title="Login">Logout</a>
                {% endifequal %}<br>
+               {% comment %}
                <a href="{% url loki.views.html.home %}" title="Home page"><img src="{% loki_media %}images/home.gif" alt="Home" /></a>
                <!--a href="{% url loki.views.html.home %}contact/" title="Contact us"><img src="{% loki_media %}images/contact.gif" alt="Contact" /></a-->
                {% ifequal user.is_superuser 1 %}
@@ -35,7 +35,7 @@
                {% endifequal %}
                {% endcomment %}
            </div>
-           <img src="" alt="Logo" style="float:left; padding-top: 20px;">
+           <a href="{% url loki.views.home %}"><img src="" alt="Logo" style="float:left; padding-top: 20px;"></a>
            <h1 style="padding-top: 20px;">{% block headtitle %}Loki :: Buildbot Manager{% endblock %}</h1>
            <h2>Buildbot!</h2>
        </div>

@@ -1,3 +1,6 @@
+
+#running { color: #009900; background: none; }
+#stopped { color: #DA3B3B; background: none; }
 input {
     font: 1em Arial, sans-serif;
 }

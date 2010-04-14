@@ -15,6 +15,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.decorators import user_passes_test
+from django.template import RequestContext
 
 from loki.models import Master, Slave, Config, ConfigParam
 from loki.models import Status, StatusParam
@@ -35,29 +36,44 @@ def home(request, master=None, slave=None):
     context['status'] = Config.objects.filter(content_type=status_content_type)
     context['scheduler'] = Config.objects.filter(content_type=scheduler_content_type)
     action = None
+    render_template = 'home'
     if request.method == 'GET' and 'action' in request.GET \
             and request.user.is_superuser:
         if request.GET['action'] in ['start', 'stop', 'reconfig']:
             action = request.GET['action']
     if slave:
-        slave = Slave.objects.get(name=slave)
+        if slave == 'all':
+            slaves = Slave.objects.all()
+        else:
+            render_template = 'slave'
+            slaves = [Slave.objects.get(name=slave)]
+            context['slave'] = slaves[0]
         if action:
-            slave.buildbot_run(action)
+            for slave in slaves:
+                slave.buildbot_run(action)
             time.sleep(1)
-            return HttpResponseRedirect(reverse('loki.views.home',
+            if len(slaves) == 1:
+                return HttpResponseRedirect(reverse('loki.views.home',
                                         args=[slave.master.name, slave.name]))
-        context['slave'] = slave
-        return render_to_response('loki/slave.html', context)
+
     elif master:
-        master = Master.objects.get(name=master)
+        if master == 'all':
+            masters = Master.objects.all()
+        else:
+            render_template = 'master'
+            masters = [Master.objects.get(name=master)]
+            context['master'] = masters[0]
         if action:
-            master.buildbot_run(action)
+            for master in masters:
+                master.buildbot_run(action)
             time.sleep(1)
-            return HttpResponseRedirect(reverse('loki.views.home',
+            if len(masters) == 1:
+                return HttpResponseRedirect(reverse('loki.views.home',
                                             args=[master.name]))
-        context['master'] = master
-        return render_to_response('loki/master.html', context)
-    return render_to_response('loki/home.html', context)
+
+    return render_to_response('loki/%s.html' % render_template, context,
+                              context_instance=RequestContext(request))
+
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -75,7 +91,8 @@ def config_add(request, type, bot_id, config_id):
                'config': config,
                'config_num': config_num, }
 
-    return render_to_response('loki/ajax/config.html', context)
+    return render_to_response('loki/ajax/config.html', context,
+                              context_instance=RequestContext(request))
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -88,7 +105,8 @@ def config_load(request, type, config_id):
         config = Scheduler.objects.get(pk=config_id)
     context = {type: config, }
 
-    return render_to_response('loki/ajax/%s.html' % type, context)
+    return render_to_response('loki/ajax/%s.html' % type, context,
+                              context_instance=RequestContext(request))
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -283,4 +301,5 @@ def import_config(request, type):
     context = {'path': path,
                 'type': type,
                 'classes': introspected, }
-    return render_to_response('loki/import.html', context)
+    return render_to_response('loki/import.html', context,
+                              context_instance=RequestContext(request))

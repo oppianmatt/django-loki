@@ -17,8 +17,8 @@ from django.contrib.auth.views import logout_then_login
 
 # App views
 urlpatterns = patterns('loki.views',
-    (r'^$', 'home'),
     (r'^favicon.ico/?$', 'home'),
+    (r'^$', 'home'),
     (r'^login/$', login),
     (r'^logout/$', logout_then_login),
     (r'^import/(steps|status|scheduler)/', 'import_config'),
