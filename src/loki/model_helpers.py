@@ -16,6 +16,7 @@ from buildbot.scripts.runner import createMaster
 from buildbot.scripts.runner import createSlave
 from buildbot.scripts.runner import restart
 from buildbot.scripts.runner import stop
+from buildbot.interfaces import BuildbotNotRunningError
 from twisted.python import usage
 
 from loki.thread import BuildBotStart
@@ -184,7 +185,10 @@ def build_bot_run(options):
             os.waitpid(child_pid, 0)
 
     elif command == "stop":
-        stop(so, wait=True)
+        try:
+            stop(so, wait=True)
+        except BuildbotNotRunningError:
+            pass
     elif command == "restart":
         restart(so)
     elif command == "reconfig" or command == "sighup":
