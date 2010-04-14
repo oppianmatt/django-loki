@@ -23,7 +23,7 @@
        
        <div id="top" class="content">
            <div id="icons">
-               {% ifequal user.username "" %}<a href="{% url loki.authentication.smart_login None %}" title="Login">Login</a>
+               {% ifequal user.username "" %}<a href="{% url loki.authentication.smart_login %}" title="Login">Login</a>
                {% else %}{{ user.username }} :: 
                    <a href="{% url django.contrib.auth.views.logout_then_login %}" title="Login">Logout</a>
                {% endifequal %}<br>

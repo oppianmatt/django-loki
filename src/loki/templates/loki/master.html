@@ -11,9 +11,9 @@
         });
     {% endblock %}
     {% block drawer_title %}
-        {% if master.alive %}Running <a href="/{{ master }}/?action=reconfig">reconfig/hup</a>
-            :: pid {{ master.pid }} :: <a href="/{{ master }}/?action=stop">Stop</a>
-        {% else %}Stopped :: <a href="/{{ master }}/?action=start">Start</a>{% endif %}
+        {% if master.alive %}Running{% if user.is_superuser %} <a href="{% url loki.views.home master %}?action=reconfig">reconfig/hup</a>
+            :: pid {{ master.pid }} :: <a href="{% url loki.views.home master %}?action=stop">Stop</a>{% endif %}
+        {% else %}Stopped{% if user.is_superuser %} :: <a href="{% url loki.views.home master %}?action=start">Start</a>{% endif %}{% endif %}
     {% endblock %}
     {% block content %}
         {% block title %}Master: {{ master }}{% endblock %}<br>

@@ -1,6 +1,12 @@
 
-#running { color: #009900; background: none; }
-#stopped { color: #DA3B3B; background: none; }
+#running { color: #009900; }
+#stopped { color: #DA3B3B; }
+#running, #stopped { 
+    background: none; 
+    float: right;
+    text-align: center;
+    width: 10px;
+}
 input {
     font: 1em Arial, sans-serif;
 }

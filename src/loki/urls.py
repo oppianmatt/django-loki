@@ -11,15 +11,16 @@
 from django.conf import settings
 from django.conf.urls.defaults import *
 from django.contrib import admin
-from django.contrib.auth.views import login
 from django.contrib.auth.views import logout_then_login
+
+from loki.authentication import smart_login
 
 
 # App views
 urlpatterns = patterns('loki.views',
     (r'^favicon.ico/?$', 'home'),
     (r'^$', 'home'),
-    (r'^login/$', login),
+    (r'^login/$', smart_login),
     (r'^logout/$', logout_then_login),
     (r'^import/(steps|status|scheduler)/', 'import_config'),
     (r'^ajax/config/step/save/([0-9]+)/', 'config_step_save'),
