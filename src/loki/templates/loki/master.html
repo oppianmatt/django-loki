@@ -26,26 +26,30 @@
         {% endfor %}
         <div id="newstatus" style="float: left; clear: left;"/>
         </div><br>
-        <form id="addstatus" name="addstatus" action="javascript:;" style="clear:left;">
-            <select id="status" name="status">
-            {% for s in status %}
-                <option value="{{ s.pk }}">{{ s.name }} :: {{ s.module }}</option>
-            {% endfor %}
-            </select>
-            <input type="submit" value="Add Status">
-        </form>
+        {% if user.is_superuser %}
+            <form id="addstatus" name="addstatus" action="javascript:;" style="clear:left;">
+                <select id="status" name="status">
+                {% for s in status %}
+                    <option value="{{ s.pk }}">{{ s.name }} :: {{ s.module }}</option>
+                {% endfor %}
+                </select>
+                <input type="submit" value="Add Status">
+            </form>
+        {% endif %}
         <div id="schedulers" style="float: left;">
         {% for s in master.schedulers.all %}
         {% scheduler s %}
         {% endfor %}
         <div id="newscheduler" style="float: left; clear: left;">&nbsp;</div>
         </div><br>
-        <form id="addscheduler" name="addscheduler" action="javascript:;" style="clear:left;">
-            <select id="scheduler" name="scheduler">
-            {% for s in scheduler %}
-                <option value="{{ s.pk }}">{{ s.name }} :: {{ s.module }}</option>
-            {% endfor %}
-            </select>
-            <input type="submit" value="Add Status">
-        </form>
+        {% if user.is_superuser %}
+            <form id="addscheduler" name="addscheduler" action="javascript:;" style="clear:left;">
+                <select id="scheduler" name="scheduler">
+                {% for s in scheduler %}
+                    <option value="{{ s.pk }}">{{ s.name }} :: {{ s.module }}</option>
+                {% endfor %}
+                </select>
+                <input type="submit" value="Add Scheduler">
+            </form>
+        {% endif %}
     {% endblock %}

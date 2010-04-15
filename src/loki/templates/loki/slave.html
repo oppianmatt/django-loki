@@ -22,12 +22,14 @@
         {% endfor %}
         <div id="newstep" style="float: left; clear: left;"/>
         </div><br>
-        <form id="addstep" name="addstep" action="javascript:;" style="clear:left;">
-            <select id="step" name="step">
-            {% for s in steps %}
-                <option value="{{ s.pk }}">{{ s.name }} :: {{ s.module }}</option>
-            {% endfor %}
-            </select>
-            <input type="submit" value="Add Step">
-        </form>
+        {% if user.is_superuser %}
+            <form id="addstep" name="addstep" action="javascript:;" style="clear:left;">
+                <select id="step" name="step">
+                {% for s in steps %}
+                    <option value="{{ s.pk }}">{{ s.name }} :: {{ s.module }}</option>
+                {% endfor %}
+                </select>
+                <input type="submit" value="Add Step">
+            </form>
+        {% endif %}
     {% endblock %}

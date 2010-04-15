@@ -1,14 +1,17 @@
 <div id="step{{ step.id }}" class="drawer" style="float:left;clear:left;">
 <div id="step_display{{ step.id }}">
     <div style="float: left;" class="bold">{{ step.num }}: {{ step.type }}</div>
+    {% if user.is_superuser %}
     <div style="float: left; margin-left: 10px; margin-top: 3px;">
         <img class="img_link" src="/media/admin/img/admin/icon_changelink.gif" onClick="javascript:toggleconfig('step', 'edit', {{ step.id }});">
         <img class="img_link" src="/media/admin/img/admin/icon_deletelink.gif" onClick="javascript:toggleconfig('step', 'delete', {{ step.id }});">
     </div><br>
+    {% endif %}
     {% for p in step.params.all %}
         {{ p.type.name }}: {{ p.val }}<br>
     {% endfor %}
 </div>
+{% if user.is_superuser %}
 <div id="step_edit{{ step.id }}" style="display:none;">
     <form id="step{{ step.id }}" name="savestep" action="javascript:saveconfig('step{{ step.id }}');" method="post"> 
     Edit Form Not Implimented<br>
@@ -21,4 +24,5 @@
     <button onClick="javascript:deleteconfig('step', {{ step.id }});">Confirm Delete</button>
     <button onClick="javascript:toggleconfig('step', 'display', {{ step.id }});">Cancel</button><br>
 </div>
+{% endif %}
 </div>
