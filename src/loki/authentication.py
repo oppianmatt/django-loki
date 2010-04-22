@@ -12,7 +12,11 @@
 LDAP Backend with white listed user list.
 """
 
-import ldap
+try:
+    import ldap
+except ImportError:
+    # no ldap support
+    pass
 
 
 from django.http import HttpResponseRedirect
