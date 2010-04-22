@@ -3,8 +3,8 @@
     <div style="float: left;" class="bold">{{ scheduler.type }}</div>
     {% if user.is_superuser %}
     <div style="float: left; margin-left: 10px; margin-top: 3px;">
-        <img class="img_link" src="/admin/media/img/admin/icon_changelink.gif" onClick="javascript:toggleconfig('scheduler', 'edit', {{ scheduler.id }});">
-        <img class="img_link" src="/admin/media/img/admin/icon_deletelink.gif" onClick="javascript:toggleconfig('scheduler', 'delete', {{ scheduler.id }});">
+        <img class="img_link" src="{{ ADMIN_MEDIA_PREFIX }}img/admin/icon_changelink.gif" onClick="javascript:toggleconfig('scheduler', 'edit', {{ scheduler.id }});">
+        <img class="img_link" src="{{ ADMIN_MEDIA_PREFIX }}img/admin/icon_deletelink.gif" onClick="javascript:toggleconfig('scheduler', 'delete', {{ scheduler.id }});">
     </div><br>
     {% endif %}
     {% for p in scheduler.params.all %}

@@ -16,21 +16,32 @@ import random
 import time
 
 from django import template
+from django.conf import settings
 
 register = template.Library()
 
 
-@register.inclusion_tag('loki/ajax/step.html')
-# The first argument *must* be called "context" here.
-def step(step):
-    return {'step': step, }
+@register.inclusion_tag('loki/ajax/step.html', takes_context=True)
+def step(context, step):
+    return {'step': step, 
+            'ADMIN_MEDIA_PREFIX': settings.ADMIN_MEDIA_PREFIX,
+            'user': context['request'].user,
+    }
 
 
-@register.inclusion_tag('loki/ajax/status.html')
-def status(status):
-    return {'status': status, }
+
+@register.inclusion_tag('loki/ajax/status.html', takes_context=True)
+def status(context, status):
+    return {'status': status,
+            'ADMIN_MEDIA_PREFIX': settings.ADMIN_MEDIA_PREFIX,
+            'user': context['request'].user,
+    }
 
 
-@register.inclusion_tag('loki/ajax/scheduler.html')
-def scheduler(scheduler):
-    return {'scheduler': scheduler, }
+@register.inclusion_tag('loki/ajax/scheduler.html', takes_context=True)
+def scheduler(context, scheduler):
+    return {'scheduler': scheduler, 
+            'ADMIN_MEDIA_PREFIX': settings.ADMIN_MEDIA_PREFIX,
+            'user': context['request'].user,
+    }
+

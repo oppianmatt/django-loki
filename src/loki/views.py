@@ -13,6 +13,7 @@ import time
 from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.decorators import user_passes_test
 from django.template import RequestContext
@@ -103,7 +104,7 @@ def config_load(request, type, config_id):
         config = Status.objects.get(pk=config_id)
     elif type == 'scheduler':
         config = Scheduler.objects.get(pk=config_id)
-    context = {type: config, }
+    context = {type: config, 'ADMIN_MEDIA_PREFIX': settings.ADMIN_MEDIA_PREFIX,}
 
     return render_to_response('loki/ajax/%s.html' % type, context,
                               context_instance=RequestContext(request))
