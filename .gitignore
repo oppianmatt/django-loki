@@ -6,3 +6,6 @@
 example_project/buildbots/
 example_project/twistd/
 docs/html
+Django_app_loki.egg-info
+.project
+.pydevproject
